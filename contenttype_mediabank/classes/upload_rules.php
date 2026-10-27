@@ -38,7 +38,7 @@ class upload_rules {
 
     /** @var string[][] Content types a content sniff may report for each extension. Anything else is refused. */
     public const ACCEPTED_TYPES = [
-        'mp4' => ['video/mp4', 'video/x-m4v', 'audio/mp4'],
+        'mp4' => ['video/mp4', 'video/x-m4v', 'video/quicktime', 'audio/mp4'],
         'webm' => ['video/webm', 'audio/webm'],
         'mp3' => ['audio/mpeg'],
         'm4a' => ['audio/x-m4a', 'audio/mp4', 'video/mp4'],

@@ -110,6 +110,26 @@ class contenttype extends \core_contentbank\contenttype {
     }
 
     #[\Override]
+    public function delete_content(\core_contentbank\content $content): bool {
+        // Courses and categories delete their content in bulk. Other courses must keep what they use.
+        usage::detach_all($content);
+        return parent::delete_content($content);
+    }
+
+    #[\Override]
+    public function move_content(\core_contentbank\content $content, \context $context): bool {
+        // Links point at the item's current context, so they would break. Keep them working as copies.
+        usage::detach_all($content);
+        return parent::move_content($content, $context);
+    }
+
+    #[\Override]
+    protected function is_delete_allowed(\core_contentbank\content $content): bool {
+        // An item that courses link to is not deleted by hand. Its links have to be converted first.
+        return usage::count_links($content) === 0;
+    }
+
+    #[\Override]
     public function get_view_content(\core_contentbank\content $content): string {
         $html = parent::get_view_content($content);
         $url = $content->get_file_url();
@@ -135,7 +155,48 @@ class contenttype extends \core_contentbank\contenttype {
         } else {
             $media = \html_writer::div(get_string('unsupportedpreview', 'contenttype_mediabank'));
         }
-        return $media . $html;
+        return $media . $this->render_usage($content) . $html;
+    }
+
+    /**
+     * Which courses link to the item, shown under the preview.
+     *
+     * Course names are only shown for courses the user may see. Others are counted.
+     *
+     * @param \core_contentbank\content $content The item.
+     * @return string HTML.
+     */
+    protected function render_usage(\core_contentbank\content $content): string {
+        $courses = usage::get_courses($content);
+        $heading = \html_writer::tag('h3', get_string('usageheading', 'contenttype_mediabank'), ['class' => 'h5 mt-3']);
+        if (!$courses) {
+            return $heading . \html_writer::tag('p', get_string('usagenone', 'contenttype_mediabank'));
+        }
+        $items = [];
+        $hidden = 0;
+        $other = 0;
+        foreach ($courses as $course) {
+            if (!$course->id) {
+                $other += $course->links;
+            } else if (\core_course_category::can_view_course_info($course)) {
+                $name = format_string($course->fullname, true, ['context' => \context_course::instance($course->id)]);
+                $items[] = \html_writer::tag('li', get_string(
+                    'usagecourse',
+                    'contenttype_mediabank',
+                    (object) ['name' => $name, 'links' => $course->links]
+                ));
+            } else {
+                $hidden += $course->links;
+            }
+        }
+        if ($hidden) {
+            $items[] = \html_writer::tag('li', get_string('usagehidden', 'contenttype_mediabank', $hidden));
+        }
+        if ($other) {
+            $items[] = \html_writer::tag('li', get_string('usageother', 'contenttype_mediabank', $other));
+        }
+        return $heading . \html_writer::tag('ul', implode('', $items))
+            . \html_writer::tag('p', get_string('usagedeletenote', 'contenttype_mediabank'), ['class' => 'text-muted']);
     }
 
     #[\Override]

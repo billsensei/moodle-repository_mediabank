@@ -156,12 +156,12 @@ final class upload_rules_test extends \advanced_testcase {
     }
 
     /**
-     * QuickTime movies are not accepted as mp4 until the site owner decides they should be.
+     * QuickTime-brand mp4 files, such as iPhone recordings, are accepted.
      */
-    public function test_quicktime_is_not_accepted(): void {
+    public function test_quicktime_brand_is_accepted(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
-        $this->assert_refused('errorcontentmismatch', fn() => $this->upload('phone.mp4', media_samples::get('mp4-quicktime')));
+        $this->upload('phone.mp4', media_samples::get('mp4-quicktime'));
     }
 
     /**

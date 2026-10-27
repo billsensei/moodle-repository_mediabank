@@ -95,8 +95,10 @@ class contenttype extends \core_contentbank\contenttype {
             return false;
         }
         $detected = (new \finfo(FILEINFO_MIME_TYPE))->file($file->get_content_file_location());
-        if ($detected === false || str_starts_with($detected, 'text/') || str_contains($detected, 'xml')
-                || str_contains($detected, 'html') || str_contains($detected, 'javascript')) {
+        if (
+            $detected === false || str_starts_with($detected, 'text/') || str_contains($detected, 'xml')
+                || str_contains($detected, 'html') || str_contains($detected, 'javascript')
+        ) {
             return false;
         }
         return true;

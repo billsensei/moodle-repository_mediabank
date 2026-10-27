@@ -74,9 +74,21 @@ bump `version.php`). PHPUnit needs `php public/admin/tool/phpunit/cli/init.php` 
 
     export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
     vendor/bin/phpunit --testsuite contenttype_mediabank_testsuite
-Expected: `OK, but there were issues! Tests: 31, Assertions: 60, PHPUnit Deprecations: 2` (the deprecations are the
+Expected: `OK, but there were issues! Tests: 42, Assertions: 101, PHPUnit Deprecations: 2` (the deprecations are the
 `@covers`/`@dataProvider` doc-comment style).
-Behat: `Expected: 5 scenarios (5 passed), 102 steps (102 passed)` using the commands in the Behat section above.
+Behat: expected `5 scenarios (5 passed), 111 steps (111 passed)` using the commands in the Behat section above.
 Common errors: `Class "...\media_samples" not found` (test helpers live in `tests/classes` and use namespace
 `<component>\tests`); `expectExceptionMessage('errorX')` fails because exceptions carry the translated text (assert `->errorcode`).
 Note: setting a value with `set_config()` in a test does not run the admin-setting callback, so call `upload_rules::purge_caches()`.
+
+## Phase 3 (2026-10-27)
+Admin CLI for one item (run from the Moodle root of a site with the plugins installed):
+
+    php local/mediabank/cli/item.php --id=3 --usage --versions
+Expected: `Item 3: doc.pdf`, then `Not linked from anywhere.` and `No kept versions.` (or the course and version lists).
+`--detach` converts every link to a copy; `--restore=N` puts version N back; an unknown version prints `Version N of this item does not exist.`
+Dev-only quirk: the plugins are symlinked into moodle53, so PHP resolves `__DIR__` outside Moodle and the script cannot find
+`config.php`. Run a copy with the config path edited, or install the plugin by copying it, as a real site would.
+The scheduled task `\contenttype_mediabank\task\purge_versions` runs daily at 03:17; run it by hand with
+`php admin/cli/scheduled_task.php --execute='\contenttype_mediabank\task\purge_versions'`.
+After adding a scheduled task or setting: bump `version.php` and run `php admin/cli/upgrade.php --non-interactive`.

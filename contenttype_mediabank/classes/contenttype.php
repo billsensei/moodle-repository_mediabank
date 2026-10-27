@@ -104,6 +104,7 @@ class contenttype extends \core_contentbank\contenttype {
     public function replace_content(\stored_file $file, \core_contentbank\content $content): \core_contentbank\content {
         $current = $content->get_file();
         upload_rules::validate($file, $current ? upload_rules::get_extension($current->get_filename()) : null);
+        versions::keep_current($content, $file);
         $content = parent::replace_content($file, $content);
         $content->merge_metadata(upload_rules::describe($content->get_file()));
         return $content;
@@ -113,6 +114,7 @@ class contenttype extends \core_contentbank\contenttype {
     public function delete_content(\core_contentbank\content $content): bool {
         // Courses and categories delete their content in bulk. Other courses must keep what they use.
         usage::detach_all($content);
+        versions::delete_all($content);
         return parent::delete_content($content);
     }
 
@@ -120,7 +122,12 @@ class contenttype extends \core_contentbank\contenttype {
     public function move_content(\core_contentbank\content $content, \context $context): bool {
         // Links point at the item's current context, so they would break. Keep them working as copies.
         usage::detach_all($content);
-        return parent::move_content($content, $context);
+        $from = $content->get_contextid();
+        $moved = parent::move_content($content, $context);
+        if ($moved) {
+            versions::move_all($from, $context->id, $content->get_id());
+        }
+        return $moved;
     }
 
     #[\Override]

@@ -62,4 +62,12 @@ if ($ADMIN->fulltree) {
             $default
         ));
     }
+
+    $settings->add(new admin_setting_configtext(
+        'contenttype_mediabank/versionretentiondays',
+        get_string('versionretentiondays', 'contenttype_mediabank'),
+        get_string('versionretentiondays_desc', 'contenttype_mediabank'),
+        contenttype_mediabank\versions::DEFAULT_RETENTION_DAYS,
+        PARAM_INT
+    ));
 }

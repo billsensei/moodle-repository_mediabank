@@ -83,6 +83,17 @@ Feature: Upload media to the content bank and use it in a course as a link or a 
     And I click on "Select this file" "button"
     And I click on "Save and return to course" "button"
     And I should see "linkedimage"
+    # The item page now says where it is used and explains why it cannot be deleted.
+    And I am on "Course 1" course homepage with editing mode on
+    And the following config values are set as admin:
+      | unaddableblocks | | theme_boost|
+    And I add the "Navigation" block if not present
+    And I expand "Site pages" node
+    And I click on "Content bank" "link"
+    And I click on "bankimage" "link"
+    And I should see "Where this item is used"
+    And I should see "Course 1: 1 link(s)"
+    And I should see "This item cannot be deleted while courses link to it."
 
   Scenario: A teacher picks a content bank item as an independent copy
     Given the following "contentbank content" exist:

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0 (2026-10-27)
+- Where-used panel on the item page; items with links cannot be deleted by hand.
+- Bulk delete and move convert links to copies first (links are synced before converting).
+- Replaced files are kept as versions for a configurable number of days; restore; daily purge task.
+
 ## 0.2.0 (2026-10-27)
 - Upload rules: allowed kinds, per-kind size limits, SVG off by default, positive content check, same-extension replace.
 - Metadata (kind, image size) kept in the item's configdata.

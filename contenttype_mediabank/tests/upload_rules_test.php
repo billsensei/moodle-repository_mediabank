@@ -129,6 +129,33 @@ final class upload_rules_test extends \advanced_testcase {
     }
 
     /**
+     * An ID3 header that cannot be skipped cleanly fails closed: a size past the end of the file, or invalid size bytes.
+     */
+    public function test_bad_id3_header_is_refused(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $frame = "\xFF\xFB\x90\x00" . str_repeat("\0", 64);
+        // Claims a 1 MB tag in a tiny file, with a valid frame right after the header.
+        $toolong = "ID3\x03\x00\x00\x00\x40\x00\x00" . $frame;
+        $this->assert_refused('errorcontentmismatch', fn() => $this->upload('long.mp3', $toolong));
+        // Size bytes with the top bit set are not valid.
+        $invalid = "ID3\x03\x00\x00\xFF\xFF\xFF\xFF" . $frame;
+        $this->assert_refused('errorcontentmismatch', fn() => $this->upload('invalid.mp3', $invalid));
+    }
+
+    /**
+     * A tag with the footer flag is skipped including its footer.
+     */
+    public function test_id3_footer_is_skipped(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $tag = 20;
+        $data = "ID3\x04\x00\x10\x00\x00\x00\x14" . str_repeat("\0", $tag) . "3DI\x04\x00\x10\x00\x00\x00\x14"
+            . "\xFF\xFB\x90\x00" . str_repeat("\0", 64);
+        $this->upload('footer.mp3', $data);
+    }
+
+    /**
      * QuickTime movies are not accepted as mp4 until the site owner decides they should be.
      */
     public function test_quicktime_is_not_accepted(): void {

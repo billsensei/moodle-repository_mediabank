@@ -166,12 +166,17 @@ class upload_rules {
         }
         $head = fread($handle, self::SNIFF_BYTES);
         // An mp3 may start with a large ID3 tag (cover art), which hides the audio from the sniff. Look past it.
-        if ($extension === 'mp3' && $head !== false && strlen($head) >= 10 && str_starts_with($head, 'ID3')) {
-            $size = ((ord($head[6]) & 0x7f) << 21) | ((ord($head[7]) & 0x7f) << 14)
-                | ((ord($head[8]) & 0x7f) << 7) | (ord($head[9]) & 0x7f);
-            if ($size <= self::MAX_ID3_BYTES && $size + 10 <= $file->get_filesize() && fseek($handle, 10 + $size) === 0) {
-                $head = fread($handle, self::SNIFF_BYTES);
+        // If the tag cannot be skipped cleanly, refuse the file rather than sniff the tag itself.
+        if ($extension === 'mp3' && $head !== false && str_starts_with($head, 'ID3')) {
+            $size = strlen($head) >= 10 ? self::get_id3_end($head) : null;
+            if (
+                $size === null || $size > self::MAX_ID3_BYTES || $size >= $file->get_filesize()
+                    || fseek($handle, $size) !== 0
+            ) {
+                fclose($handle);
+                return false;
             }
+            $head = fread($handle, self::SNIFF_BYTES);
         }
         fclose($handle);
         if ($head === false || $head === '') {
@@ -179,6 +184,25 @@ class upload_rules {
         }
         $detected = (new \finfo(FILEINFO_MIME_TYPE))->buffer($head);
         return in_array($detected, self::ACCEPTED_TYPES[$extension], true);
+    }
+
+    /**
+     * Where the audio starts in a file that begins with an ID3v2 tag.
+     *
+     * @param string $head At least the first 10 bytes of the file.
+     * @return int|null Offset of the first byte after the tag (and its footer if flagged), or null if the header is invalid.
+     */
+    protected static function get_id3_end(string $head): ?int {
+        // The size is four "syncsafe" bytes, seven bits each, so any byte with the top bit set is invalid.
+        $sizebytes = array_map('ord', str_split(substr($head, 6, 4)));
+        foreach ($sizebytes as $byte) {
+            if ($byte & 0x80) {
+                return null;
+            }
+        }
+        $size = ($sizebytes[0] << 21) | ($sizebytes[1] << 14) | ($sizebytes[2] << 7) | $sizebytes[3];
+        $footer = (ord($head[5]) & 0x10) ? 10 : 0;
+        return 10 + $size + $footer;
     }
 
     /**

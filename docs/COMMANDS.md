@@ -95,9 +95,12 @@ After adding a scheduled task or setting: bump `version.php` and run `php admin/
 
 ## Phase 4 (2026-10-27)
 After adding a capability or template: bump `version.php`, `php admin/cli/upgrade.php --non-interactive`, then `php public/admin/tool/phpunit/cli/init.php`.
-PHPUnit: `vendor/bin/phpunit --testsuite contenttype_mediabank_testsuite` -> `Tests: 52, Assertions: ...`.
-Behat: `vendor/bin/behat --config /home/bill/test/m53behat/behatrun/behat/behat.yml --tags=@contenttype_mediabank` -> `7 scenarios (7 passed)`.
+PHPUnit: `vendor/bin/phpunit --testsuite contenttype_mediabank_testsuite` -> `OK, but there were issues! Tests: 53, Assertions: 143, PHPUnit Deprecations: 2` (the deprecations are the `@covers`-style notes noted above).
+Behat: `vendor/bin/behat --config /home/bill/test/m53behat/behatrun/behat/behat.yml --tags=@contenttype_mediabank` -> `7 scenarios (7 passed)`, `151 steps (151 passed)`, about 6 minutes (one clean run, 2026-10-27).
 Run one scenario with `--name="<scenario title>"` (a `file:line` path does not work with this config).
 Problem hit: `This is not a behat test site!` after an init was killed half-way. `util.php --drop` fails the same check. The fix was to drop the `bht_` tables
 by hand (test-only prefix; the dev site uses `mdl_`) and empty `behatrun/` including the hidden `.htaccess`, then run `init.php` again.
 Run `init.php` in the background (it takes about 3 minutes with the theme build); a foreground timeout kills it half-way.
+phpcs: no output, exit 0. Mustache lint (`moodle-plugin-ci mustache -m <moodle> <plugin>`) needs the plugin inside the Moodle tree without a symlink; run on a temporary copy: `Mustache rendered html succesfully`.
+HTTP check of the new URLs on the dev site (login with temporary users, deleted afterwards): captions as manager -> 200, `text/vtt`, `inline`, `nosniff`;
+earlier version as manager -> 200, `attachment`; both as a user without the right, and a wrong caption file name -> 404.

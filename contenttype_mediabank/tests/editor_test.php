@@ -289,4 +289,37 @@ final class editor_test extends \advanced_testcase {
         $wrongname = [$item->get_id(), 'x.vtt'];
         $this->assertFalse(contenttype_mediabank_pluginfile($course, null, $context, 'captions', $wrongname, false));
     }
+
+    /**
+     * Captions of an unlisted item are not served to someone who may not see unlisted content.
+     */
+    public function test_captions_of_unlisted_item_are_hidden(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/contentbank/contenttype/mediabank/lib.php');
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course();
+        $context = \context_course::instance($course->id);
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('contenttype/mediabank:access', CAP_ALLOW, $roleid, $context->id, true);
+        assign_capability('moodle/contentbank:access', CAP_ALLOW, $roleid, $context->id, true);
+        $viewer = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        role_assign($roleid, $viewer->id, $context->id);
+
+        $item = link_helper::create_item('talk.mp3', media_samples::get('mp3'), $context);
+        $source = get_file_storage()->get_file(
+            \context_user::instance(get_admin()->id)->id,
+            'user',
+            'draft',
+            $this->draft('c.vtt', "WEBVTT\n"),
+            '/',
+            'c.vtt'
+        );
+        captions::save($item, $source);
+        $item->set_visibility(content::VISIBILITY_UNLISTED);
+
+        $this->setUser($viewer);
+        $args = [$item->get_id(), captions::FILENAME];
+        $this->assertFalse(contenttype_mediabank_pluginfile($course, null, $context, 'captions', $args, false));
+    }
 }

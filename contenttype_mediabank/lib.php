@@ -65,7 +65,8 @@ function contenttype_mediabank_pluginfile($course, $cm, $context, $filearea, $ar
     }
     $contenttype = new \contenttype_mediabank\contenttype($context);
     $content = new \contenttype_mediabank\content($record);
-    if (!$contenttype->can_access()) {
+    // Unlisted items are hidden from people who may not see unlisted content, as on the item page.
+    if (!$contenttype->can_access() || !$content->is_view_allowed()) {
         return false;
     }
 

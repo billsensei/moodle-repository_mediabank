@@ -23,6 +23,9 @@ Feature: Upload media to the content bank and use it in a course as a link or a 
     And the following "user private file" exists:
       | user     | teacher1                                                  |
       | filepath | contentbank/contenttype/mediabank/tests/fixtures/sample.pdf |
+    And the following "user private file" exists:
+      | user     | teacher1                                                      |
+      | filepath | contentbank/contenttype/mediabank/tests/fixtures/notreally.png |
 
   Scenario Outline: A teacher uploads a media file to the course content bank
     Given I log in as "teacher1"
@@ -46,6 +49,24 @@ Feature: Upload media to the content bank and use it in a course as a link or a 
       | file       |
       | sample.png |
       | sample.pdf |
+
+  Scenario: A file whose content does not match its name is refused with a clear message
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    And the following config values are set as admin:
+      | unaddableblocks | | theme_boost|
+    And I add the "Navigation" block if not present
+    And I expand "Site pages" node
+    And I click on "Content bank" "link"
+    When I click on "Upload" "link"
+    And I click on "Choose a file..." "button"
+    And I click on "Private files" "link" in the ".fp-repo-area" "css_element"
+    And I click on "notreally.png" "link"
+    And I click on "Select this file" "button"
+    And I click on "Save changes" "button"
+    And I wait until the page is ready
+    Then I should see "was not accepted because its content is not the kind of file its name says"
+    And "notreally.png" "link" should not exist
 
   Scenario: A teacher picks a content bank item as a link, which is the default
     Given the following "contentbank content" exist:

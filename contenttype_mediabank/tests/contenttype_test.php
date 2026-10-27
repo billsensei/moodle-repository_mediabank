@@ -33,9 +33,10 @@ final class contenttype_test extends \advanced_testcase {
         $this->resetAfterTest();
         $type = new contenttype(\context_system::instance());
         $extensions = $type->get_manageable_extensions();
-        foreach (['.mp4', '.mp3', '.pdf', '.png', '.svg'] as $expected) {
+        foreach (['.mp4', '.mp3', '.pdf', '.png'] as $expected) {
             $this->assertContains($expected, $extensions);
         }
+        $this->assertNotContains('.svg', $extensions);
         $this->assertArrayNotHasKey('svg', contenttype::INLINE_MIMETYPES);
     }
 
@@ -84,9 +85,19 @@ final class contenttype_test extends \advanced_testcase {
         $good = $this->upload_item('ok.png', $png)->get_file();
         $this->assertTrue($method->invoke(null, $good, 'png'));
 
-        $html = $this->upload_item('evil.png', '<html><script>alert(1)</script></html>')->get_file();
+        // Upload refuses this, so store it directly to prove serving would also refuse it.
+        $html = get_file_storage()->create_file_from_string([
+            'contextid' => \context_system::instance()->id,
+            'component' => 'contentbank',
+            'filearea' => 'public',
+            'itemid' => 999,
+            'filepath' => '/',
+            'filename' => 'evil.png',
+        ], '<html><script>alert(1)</script></html>');
         $this->assertFalse($method->invoke(null, $html, 'png'));
 
+        set_config('allowsvg', 1, 'contenttype_mediabank');
+        upload_rules::purge_caches();
         $svg = $this->upload_item('x.svg', '<svg xmlns="http://www.w3.org/2000/svg"><script/></svg>')->get_file();
         $this->assertFalse($method->invoke(null, $svg, 'svg'));
     }

@@ -24,4 +24,24 @@ namespace contenttype_mediabank;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class content extends \core_contentbank\content {
+    /**
+     * Facts kept with the item: kind, image size, and later alt text, transcript and so on.
+     *
+     * @return array
+     */
+    public function get_metadata(): array {
+        $decoded = json_decode((string) $this->get_configdata(), true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Add or change facts kept with the item. Other keys are left alone.
+     *
+     * @param array $values Keys to set. A null value removes the key.
+     * @return bool
+     */
+    public function merge_metadata(array $values): bool {
+        $metadata = array_filter(array_merge($this->get_metadata(), $values), fn($value) => $value !== null);
+        return $this->set_configdata(json_encode($metadata));
+    }
 }

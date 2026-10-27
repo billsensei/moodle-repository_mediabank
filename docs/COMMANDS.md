@@ -67,3 +67,16 @@ What the scenarios prove: a teacher can upload png and pdf to the course content
 "Link to the file" selected by default; a copy can be chosen instead; both save into a File resource.
 What they do NOT prove: that the saved file is an alias, or that replacing the bank item updates it (covered by the PHPUnit
 test `test_link_follows_replace`), and nothing about system-level items or video.
+
+## Phase 2 test run (2026-10-27)
+After changing plugin code that adds settings, run `php admin/cli/upgrade.php --non-interactive` (installs setting defaults;
+bump `version.php`). PHPUnit needs `php public/admin/tool/phpunit/cli/init.php` after a version bump or new tests.
+
+    export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
+    vendor/bin/phpunit --testsuite contenttype_mediabank_testsuite
+Expected: `OK, but there were issues! Tests: 26, Assertions: 56, PHPUnit Deprecations: 2` (the deprecations are the
+`@covers`/`@dataProvider` doc-comment style).
+Behat: `Expected: 5 scenarios (5 passed), 102 steps (102 passed)` using the commands in the Behat section above.
+Common errors: `Class "...\media_samples" not found` (test helpers live in `tests/classes` and use namespace
+`<component>\tests`); `expectExceptionMessage('errorX')` fails because exceptions carry the translated text (assert `->errorcode`).
+Note: setting a value with `set_config()` in a test does not run the admin-setting callback, so call `upload_rules::purge_caches()`.

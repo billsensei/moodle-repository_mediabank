@@ -80,36 +80,33 @@ class contenttype extends \core_contentbank\contenttype {
     /**
      * Whether a file may be sent inline.
      *
-     * The extension must be on the allow-list, Moodle's stored MIME type must match it, and the real
-     * content must not look like text, HTML, XML or script (for example HTML renamed to .png).
+     * The extension must be on the inline allow-list and the first bytes of the file must really be that kind of
+     * file. Moodle sets the stored MIME type from the file name, so that field is not used.
      *
      * @param \stored_file $file The file to check.
      * @param string $extension Lower-case extension without the dot.
      * @return bool
      */
     protected static function is_safe_to_serve_inline(\stored_file $file, string $extension): bool {
-        if (!array_key_exists($extension, self::INLINE_MIMETYPES)) {
-            return false;
-        }
-        if ($file->get_mimetype() !== self::INLINE_MIMETYPES[$extension]) {
-            return false;
-        }
-        $handle = $file->get_content_file_handle();
-        $head = $handle ? fread($handle, 8192) : false;
-        if ($handle) {
-            fclose($handle);
-        }
-        if ($head === false) {
-            return false;
-        }
-        $detected = (new \finfo(FILEINFO_MIME_TYPE))->buffer($head);
-        if (
-            $detected === false || str_starts_with($detected, 'text/') || str_contains($detected, 'xml')
-                || str_contains($detected, 'html') || str_contains($detected, 'javascript')
-        ) {
-            return false;
-        }
-        return true;
+        return array_key_exists($extension, self::INLINE_MIMETYPES)
+            && upload_rules::content_matches_extension($file, $extension);
+    }
+
+    #[\Override]
+    public function upload_content(\stored_file $file, ?\stdClass $record = null): \core_contentbank\content {
+        upload_rules::validate($file);
+        $content = parent::upload_content($file, $record);
+        $content->merge_metadata(upload_rules::describe($file));
+        return $content;
+    }
+
+    #[\Override]
+    public function replace_content(\stored_file $file, \core_contentbank\content $content): \core_contentbank\content {
+        $current = $content->get_file();
+        upload_rules::validate($file, $current ? upload_rules::get_extension($current->get_filename()) : null);
+        $content = parent::replace_content($file, $content);
+        $content->merge_metadata(upload_rules::describe($content->get_file()));
+        return $content;
     }
 
     #[\Override]
@@ -148,10 +145,7 @@ class contenttype extends \core_contentbank\contenttype {
 
     #[\Override]
     public function get_manageable_extensions(): array {
-        $extensions = array_map(fn($ext) => ".$ext", array_keys(self::INLINE_MIMETYPES));
-        // SVG can contain scripts, so it is stored but never served inline.
-        $extensions[] = '.svg';
-        return $extensions;
+        return array_map(fn($extension) => ".$extension", upload_rules::get_allowed_extensions());
     }
 
     #[\Override]

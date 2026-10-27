@@ -48,3 +48,22 @@ PHPUnit (5.3 path is `public/admin/...`; a fresh shell needs the locale):
 Expected: `OK, but there were issues! Tests: 4, Assertions: 20, PHPUnit Deprecations: 1`
 (the deprecation is the `@covers` doc-comment style, which the Moodle coding standard still requires).
 Common errors: `Required locale 'en_AU.UTF-8' is not installed` (set LOCPATH); `Could not open input file: admin/tool/...` (use `public/`).
+
+## Behat acceptance test (2026-10-27)
+Feature: `contenttype_mediabank/tests/behat/upload_and_link.feature` (tag `@contenttype_mediabank`). Fixtures: `tests/fixtures/sample.png`, `sample.pdf`.
+Fixture paths in the feature are relative to `$CFG->dirroot`, which is `moodle53/public`.
+
+    export LOCPATH=~/.local/locale
+    cd /home/bill/test2/moodle53
+    ~/.local/root/usr/bin/chromedriver --port=9515 &                      # headless Chromium driver
+    PHP_CLI_SERVER_WORKERS=4 php -S 127.0.0.1:8010 -t public &            # Behat site (config.php behat_wwwroot)
+    php public/admin/tool/behat/cli/init.php                               # ~1 min; re-run after adding plugins/features
+    vendor/bin/behat --config /home/bill/test/m53behat/behatrun/behat/behat.yml --tags=@contenttype_mediabank
+Expected: `4 scenarios (4 passed)`, `76 steps (76 passed)`.
+Negative control done: changing `matches value "1"` to `"0"` makes the link scenario fail (exit 1).
+Stop the helpers by PID (`pgrep -x chromedriver`, `pgrep -x php`), not `pkill -f`.
+
+What the scenarios prove: a teacher can upload png and pdf to the course content bank; the file picker offers the item with
+"Link to the file" selected by default; a copy can be chosen instead; both save into a File resource.
+What they do NOT prove: that the saved file is an alias, or that replacing the bank item updates it (covered by the PHPUnit
+test `test_link_follows_replace`), and nothing about system-level items or video.

@@ -68,11 +68,37 @@ class contenttype extends \core_contentbank\contenttype {
         }
 
         $extension = strtolower(pathinfo($file->get_filename(), PATHINFO_EXTENSION));
-        if (!array_key_exists($extension, self::INLINE_MIMETYPES)) {
+        if (!self::is_safe_to_serve_inline($file, $extension)) {
             return false;
         }
 
+        header('X-Content-Type-Options: nosniff');
         send_stored_file($file, 0, 0, $forcedownload, $options);
+        return true;
+    }
+
+    /**
+     * Whether a file may be sent inline.
+     *
+     * The extension must be on the allow-list, Moodle's stored MIME type must match it, and the real
+     * content must not look like text, HTML, XML or script (for example HTML renamed to .png).
+     *
+     * @param \stored_file $file The file to check.
+     * @param string $extension Lower-case extension without the dot.
+     * @return bool
+     */
+    protected static function is_safe_to_serve_inline(\stored_file $file, string $extension): bool {
+        if (!array_key_exists($extension, self::INLINE_MIMETYPES)) {
+            return false;
+        }
+        if ($file->get_mimetype() !== self::INLINE_MIMETYPES[$extension]) {
+            return false;
+        }
+        $detected = (new \finfo(FILEINFO_MIME_TYPE))->file($file->get_content_file_location());
+        if ($detected === false || str_starts_with($detected, 'text/') || str_contains($detected, 'xml')
+                || str_contains($detected, 'html') || str_contains($detected, 'javascript')) {
+            return false;
+        }
         return true;
     }
 

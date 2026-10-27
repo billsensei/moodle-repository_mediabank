@@ -74,7 +74,7 @@ bump `version.php`). PHPUnit needs `php public/admin/tool/phpunit/cli/init.php` 
 
     export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
     vendor/bin/phpunit --testsuite contenttype_mediabank_testsuite
-Expected: `OK, but there were issues! Tests: 26, Assertions: 56, PHPUnit Deprecations: 2` (the deprecations are the
+Expected: `OK, but there were issues! Tests: 29, Assertions: 58, PHPUnit Deprecations: 2` (the deprecations are the
 `@covers`/`@dataProvider` doc-comment style).
 Behat: `Expected: 5 scenarios (5 passed), 102 steps (102 passed)` using the commands in the Behat section above.
 Common errors: `Class "...\media_samples" not found` (test helpers live in `tests/classes` and use namespace

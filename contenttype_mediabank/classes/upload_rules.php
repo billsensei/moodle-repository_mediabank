@@ -38,7 +38,7 @@ class upload_rules {
 
     /** @var string[][] Content types a content sniff may report for each extension. Anything else is refused. */
     public const ACCEPTED_TYPES = [
-        'mp4' => ['video/mp4', 'audio/mp4'],
+        'mp4' => ['video/mp4', 'video/x-m4v', 'audio/mp4'],
         'webm' => ['video/webm', 'audio/webm'],
         'mp3' => ['audio/mpeg'],
         'm4a' => ['audio/x-m4a', 'audio/mp4', 'video/mp4'],
@@ -65,6 +65,9 @@ class upload_rules {
 
     /** @var int How many bytes of the file are inspected. */
     protected const SNIFF_BYTES = 8192;
+
+    /** @var int Largest ID3 tag skipped when sniffing an mp3. */
+    protected const MAX_ID3_BYTES = 33554432;
 
     /**
      * The kinds the admin has enabled.
@@ -158,10 +161,19 @@ class upload_rules {
             return false;
         }
         $handle = $file->get_content_file_handle();
-        $head = $handle ? fread($handle, self::SNIFF_BYTES) : false;
-        if ($handle) {
-            fclose($handle);
+        if (!$handle) {
+            return false;
         }
+        $head = fread($handle, self::SNIFF_BYTES);
+        // An mp3 may start with a large ID3 tag (cover art), which hides the audio from the sniff. Look past it.
+        if ($extension === 'mp3' && $head !== false && strlen($head) >= 10 && str_starts_with($head, 'ID3')) {
+            $size = ((ord($head[6]) & 0x7f) << 21) | ((ord($head[7]) & 0x7f) << 14)
+                | ((ord($head[8]) & 0x7f) << 7) | (ord($head[9]) & 0x7f);
+            if ($size <= self::MAX_ID3_BYTES && $size + 10 <= $file->get_filesize() && fseek($handle, 10 + $size) === 0) {
+                $head = fread($handle, self::SNIFF_BYTES);
+            }
+        }
+        fclose($handle);
         if ($head === false || $head === '') {
             return false;
         }

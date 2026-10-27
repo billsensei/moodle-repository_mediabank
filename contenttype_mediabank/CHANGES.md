@@ -4,6 +4,7 @@
 - Upload rules: allowed kinds, per-kind size limits, SVG off by default, positive content check, same-extension replace.
 - Metadata (kind, image size) kept in the item's configdata.
 - Capabilities `contenttype/mediabank:access` and `:upload`.
+- mp3 files with large ID3 tags (cover art) and mp4 files with the M4V brand are accepted. QuickTime (`qt  `) brand files are refused until the site owner decides.
 - Inline serving checks the file content, sends `nosniff`.
 
 ## 0.1.0 (2026-10-27)

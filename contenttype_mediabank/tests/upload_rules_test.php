@@ -109,6 +109,35 @@ final class upload_rules_test extends \advanced_testcase {
     }
 
     /**
+     * Real-world variants: an mp3 with a large ID3 tag and an mp4 from HandBrake or Final Cut (M4V brand).
+     */
+    public function test_upload_accepts_real_world_variants(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $this->upload('podcast.mp3', media_samples::get('mp3-bigtag'));
+        $this->upload('export.mp4', media_samples::get('mp4-m4v'));
+    }
+
+    /**
+     * An ID3 tag does not let other content through under an audio name.
+     */
+    public function test_id3_tag_does_not_hide_html(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $tag = "ID3\x03\x00\x00\x00\x00\x00\x0a" . str_repeat("\0", 10);
+        $this->assert_refused('errorcontentmismatch', fn() => $this->upload('sneaky.mp3', $tag . '<html><script></script></html>'));
+    }
+
+    /**
+     * QuickTime movies are not accepted as mp4 until the site owner decides they should be.
+     */
+    public function test_quicktime_is_not_accepted(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $this->assert_refused('errorcontentmismatch', fn() => $this->upload('phone.mp4', media_samples::get('mp4-quicktime')));
+    }
+
+    /**
      * Image size is kept with the item.
      */
     public function test_image_dimensions_are_recorded(): void {

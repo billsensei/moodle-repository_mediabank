@@ -58,6 +58,15 @@ class media_samples {
                 return "GIF89a\x01\x00\x01\x00\x00\x00\x00;";
             case 'webp':
                 return "RIFF\x1A\x00\x00\x00WEBPVP8 " . $pad;
+            case 'mp3-bigtag':
+                // A 20 KB ID3 tag (like embedded cover art) before the first audio frame.
+                $size = 20000;
+                $syncsafe = chr(($size >> 21) & 0x7f) . chr(($size >> 14) & 0x7f) . chr(($size >> 7) & 0x7f) . chr($size & 0x7f);
+                return "ID3\x03\x00\x00" . $syncsafe . str_repeat("\0", $size) . "\xFF\xFB\x90\x00" . $pad;
+            case 'mp4-m4v':
+                return "\x00\x00\x00\x18ftypM4V \x00\x00\x02\x00M4V iso2" . $pad;
+            case 'mp4-quicktime':
+                return "\x00\x00\x00\x18ftypqt  \x00\x00\x02\x00qt  iso2" . $pad;
             case 'svg':
                 return '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>';
         }

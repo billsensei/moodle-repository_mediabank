@@ -65,8 +65,10 @@ jobs:
 
       - name: Install moodle-plugin-ci
         run: |
+          # local_mediabank depends on contenttype_mediabank. Directory layout for --extra-plugins is unverified.
+          mkdir -p extra && cp -r ./repo/contenttype_mediabank extra/
           moodle-plugin-ci install --plugin ./repo/${{ matrix.plugin }} --db-host=127.0.0.1 \
-            ${{ matrix.plugin == 'local_mediabank' && '--extra-plugin-dir=./repo/contenttype_mediabank' || '' }}
+            ${{ matrix.plugin == 'local_mediabank' && '--extra-plugins=./extra' || '' }}
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}

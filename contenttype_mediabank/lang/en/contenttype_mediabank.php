@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['description'] = 'Video, audio, PDF and image files';
 $string['pluginname'] = 'Media bank';
+$string['mediabank:access'] = 'Access media bank content';
+$string['mediabank:upload'] = 'Upload new media bank content';
 $string['pluginname_help'] = 'Content bank to upload videos, audio, PDFs and images once and use them in any course.';
 $string['privacy:metadata'] = 'The media bank content type does not store any personal data.';
 $string['unsupportedpreview'] = 'No preview is available for this file type.';

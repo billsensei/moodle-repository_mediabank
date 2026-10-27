@@ -94,7 +94,15 @@ class contenttype extends \core_contentbank\contenttype {
         if ($file->get_mimetype() !== self::INLINE_MIMETYPES[$extension]) {
             return false;
         }
-        $detected = (new \finfo(FILEINFO_MIME_TYPE))->file($file->get_content_file_location());
+        $handle = $file->get_content_file_handle();
+        $head = $handle ? fread($handle, 8192) : false;
+        if ($handle) {
+            fclose($handle);
+        }
+        if ($head === false) {
+            return false;
+        }
+        $detected = (new \finfo(FILEINFO_MIME_TYPE))->buffer($head);
         if (
             $detected === false || str_starts_with($detected, 'text/') || str_contains($detected, 'xml')
                 || str_contains($detected, 'html') || str_contains($detected, 'javascript')

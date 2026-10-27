@@ -157,6 +157,48 @@ final class versions_test extends \advanced_testcase {
     }
 
     /**
+     * Versions of an item that core removed without calling this plugin (privacy deletion) are swept up.
+     */
+    public function test_orphaned_versions_are_purged(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $item = link_helper::create_item('doc.pdf', $this->pdf(1));
+        $this->replace($item, $this->pdf(2));
+        $this->assertCount(1, versions::get_versions($item));
+
+        // What core_contentbank's privacy provider does: delete the record and the public file directly.
+        get_file_storage()->delete_area_files($item->get_contextid(), 'contentbank', 'public', $item->get_id());
+        $DB->delete_records('contentbank_content', ['id' => $item->get_id()]);
+
+        $this->assertSame(1, versions::purge_expired());
+        $this->assertCount(0, get_file_storage()->get_area_files(
+            \context_system::instance()->id,
+            'contenttype_mediabank',
+            versions::FILEAREA,
+            false,
+            'id',
+            false
+        ));
+    }
+
+    /**
+     * Versions hold no personal data: no user, author or source, even if the live file had them.
+     */
+    public function test_versions_carry_no_personal_data(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $item = link_helper::create_item('doc.pdf', $this->pdf(1));
+        $item->get_file()->set_author('Jane Teacher');
+        $item->get_file()->set_source('uploaded by Jane');
+        $this->replace($item, $this->pdf(2));
+        $version = versions::get_versions($item)[1];
+        $this->assertEmpty($version->get_userid());
+        $this->assertEmpty($version->get_author());
+        $this->assertEmpty($version->get_source());
+    }
+
+    /**
      * Versions go away with the item, and move with it.
      */
     public function test_versions_follow_delete_and_move(): void {

@@ -57,5 +57,5 @@ $string['usageother'] = 'Outside courses: {$a} link(s)';
 $string['errornosuchversion'] = 'Version {$a} of this item does not exist.';
 $string['taskpurgeversions'] = 'Delete expired media bank versions';
 $string['versionretentiondays'] = 'Keep replaced files for (days)';
-$string['versionretentiondays_desc'] = 'When an item is replaced, the old file is kept for this many days so the replacement can be undone. 0 keeps nothing. Kept versions share disk space with the live file until they expire, then a file that is no longer used is removed.';
+$string['versionretentiondays_desc'] = 'When an item is replaced, the old file is kept for this many days so the replacement can be undone. 0 keeps nothing. Each kept file uses its full size in disk space until it expires: replacing a 500 MB video holds 500 MB for the whole period.';
 $string['unsupportedpreview'] = 'No preview is available for this file type.';

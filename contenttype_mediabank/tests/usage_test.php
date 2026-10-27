@@ -82,6 +82,7 @@ final class usage_test extends \advanced_testcase {
         $item = link_helper::create_item('pic.png', media_samples::get('png'));
         $link = link_helper::create_link($item, \context_course::instance($course->id));
         $hash = $item->get_file()->get_contenthash();
+        $bytes = $item->get_file()->get_content();
 
         $this->assertTrue($item->get_content_type_instance()->delete_content($item));
 
@@ -89,6 +90,8 @@ final class usage_test extends \advanced_testcase {
         $this->assertFalse($copy->is_external_file(), 'The link should now be an independent copy.');
         $this->assertSame($hash, $copy->get_contenthash());
         $this->assertGreaterThan(0, $copy->get_filesize());
+        // The bytes must still be on disk after the source file was deleted, not just the database row.
+        $this->assertSame($bytes, $copy->get_content());
     }
 
     /**
@@ -102,6 +105,7 @@ final class usage_test extends \advanced_testcase {
         $item = link_helper::create_item('pic.png', media_samples::get('png'));
         $link = link_helper::create_link($item, \context_course::instance($course->id));
         $hash = $item->get_file()->get_contenthash();
+        $bytes = $item->get_file()->get_content();
 
         $moved = $item->get_content_type_instance()->move_content($item, \context_course::instance($target->id));
         $this->assertTrue($moved);
@@ -109,6 +113,7 @@ final class usage_test extends \advanced_testcase {
         $copy = get_file_storage()->get_file_by_id($link->get_id());
         $this->assertFalse($copy->is_external_file());
         $this->assertSame($hash, $copy->get_contenthash());
+        $this->assertSame($bytes, $copy->get_content());
         $this->assertSame(\context_course::instance($target->id)->id, (int) $item->get_file()->get_contextid());
     }
 

@@ -20,8 +20,9 @@ namespace contenttype_mediabank;
  * Earlier versions of a media bank item, kept for a while after the item is replaced so a bad replace can be undone.
  *
  * A version is a stored file in the plugin's own file area (component contenttype_mediabank, area versions, item id =
- * content id, file path /N/). It shares the old content with the file system, so keeping it costs no extra disk
- * space until the retention time passes. Versions carry no user id.
+ * content id, file path /N/). Keeping one makes no extra copy, because it shares the stored bytes of the file that was
+ * replaced, but those bytes are not freed until the version expires. Replacing a 500 MB video therefore holds 500 MB of
+ * disk for the whole retention time. Versions carry no user id, author or source, so they hold no personal data.
  *
  * @package    contenttype_mediabank
  * @copyright  2026 SenseiMoodle
@@ -71,6 +72,8 @@ class versions {
             'filepath' => "/$next/",
             'filename' => $current->get_filename(),
             'userid' => null,
+            'author' => null,
+            'source' => null,
             'timecreated' => time(),
         ], $current);
     }
@@ -116,7 +119,7 @@ class versions {
     }
 
     /**
-     * Delete versions older than the retention time.
+     * Delete versions older than the retention time, and versions of items that no longer exist.
      *
      * @return int Number of versions deleted.
      */
@@ -125,10 +128,13 @@ class versions {
         $cutoff = time() - self::get_retention_days() * DAYSECS;
         $fs = get_file_storage();
         $count = 0;
+        // Also versions whose item no longer exists. Core's privacy deletion removes items without calling the content
+        // type, so their versions would otherwise stay.
         $rows = $DB->get_records_select(
             'files',
-            "component = ? AND filearea = ? AND filename <> '.' AND timecreated < ?",
-            ['contenttype_mediabank', self::FILEAREA, $cutoff]
+            "component = :component AND filearea = :filearea AND filename <> '.' AND (timecreated < :cutoff
+                OR NOT EXISTS (SELECT 1 FROM {contentbank_content} cb WHERE cb.id = {files}.itemid))",
+            ['component' => 'contenttype_mediabank', 'filearea' => self::FILEAREA, 'cutoff' => $cutoff]
         );
         foreach ($rows as $row) {
             $file = $fs->get_file_by_id($row->id);

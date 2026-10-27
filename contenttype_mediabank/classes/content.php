@@ -44,4 +44,22 @@ class content extends \core_contentbank\content {
         $metadata = array_filter(array_merge($this->get_metadata(), $values), fn($value) => $value !== null);
         return $this->set_configdata(json_encode($metadata));
     }
+
+    /**
+     * Text alternative of an image item.
+     *
+     * @return string
+     */
+    public function get_alt(): string {
+        return (string) ($this->get_metadata()['alt'] ?? '');
+    }
+
+    /**
+     * Written transcript of a video or audio item.
+     *
+     * @return string
+     */
+    public function get_transcript(): string {
+        return (string) ($this->get_metadata()['transcript'] ?? '');
+    }
 }

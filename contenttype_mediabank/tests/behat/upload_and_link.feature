@@ -94,6 +94,7 @@ Feature: Upload media to the content bank and use it in a course as a link or a 
     And I should see "Where this item is used"
     And I should see "Course 1: 1 link(s)"
     And I should see "This item cannot be deleted while courses link to it."
+    And "Delete" "link" should not exist
 
   Scenario: A teacher picks a content bank item as an independent copy
     Given the following "contentbank content" exist:

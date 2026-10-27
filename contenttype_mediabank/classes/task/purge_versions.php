@@ -16,6 +16,7 @@
 
 namespace contenttype_mediabank\task;
 
+use contenttype_mediabank\captions;
 use contenttype_mediabank\versions;
 
 /**
@@ -35,5 +36,6 @@ class purge_versions extends \core\task\scheduled_task {
     public function execute() {
         $count = versions::purge_expired();
         mtrace("Deleted $count expired media bank version(s).");
+        mtrace('Deleted ' . captions::purge_orphans() . ' orphaned caption file(s).');
     }
 }

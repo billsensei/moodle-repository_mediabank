@@ -92,3 +92,12 @@ Dev-only quirk: the plugins are symlinked into moodle53, so PHP resolves `__DIR_
 The scheduled task `\contenttype_mediabank\task\purge_versions` runs daily at 03:17; run it by hand with
 `php admin/cli/scheduled_task.php --execute='\contenttype_mediabank\task\purge_versions'`.
 After adding a scheduled task or setting: bump `version.php` and run `php admin/cli/upgrade.php --non-interactive`.
+
+## Phase 4 (2026-10-27)
+After adding a capability or template: bump `version.php`, `php admin/cli/upgrade.php --non-interactive`, then `php public/admin/tool/phpunit/cli/init.php`.
+PHPUnit: `vendor/bin/phpunit --testsuite contenttype_mediabank_testsuite` -> `Tests: 52, Assertions: ...`.
+Behat: `vendor/bin/behat --config /home/bill/test/m53behat/behatrun/behat/behat.yml --tags=@contenttype_mediabank` -> `7 scenarios (7 passed)`.
+Run one scenario with `--name="<scenario title>"` (a `file:line` path does not work with this config).
+Problem hit: `This is not a behat test site!` after an init was killed half-way. `util.php --drop` fails the same check. The fix was to drop the `bht_` tables
+by hand (test-only prefix; the dev site uses `mdl_`) and empty `behatrun/` including the hidden `.htaccess`, then run `init.php` again.
+Run `init.php` in the background (it takes about 3 minutes with the theme build); a foreground timeout kills it half-way.

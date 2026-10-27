@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0 (2026-10-27)
+- Edit form (core's Edit button): text alternative (required for images), transcript, WebVTT captions, restore an earlier version, download earlier versions, convert all links to copies. New capability `contenttype/mediabank:useeditor`.
+- Preview is a Mustache template: captions track, transcript in a collapsed details element, image alt text (falls back to the item name), PDF height in CSS.
+- `lib.php` serves captions (inline) and earlier versions (download only, managers only); the item must be a media bank item in the context named by the URL.
+- Captions move with the item, are deleted with it, and orphans are swept by the daily task.
+
 ## 0.3.0 (2026-10-27)
 - Where-used panel on the item page; items with links cannot be deleted by hand.
 - Bulk delete and move convert links to copies first (links are synced before converting).

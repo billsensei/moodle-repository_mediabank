@@ -115,6 +115,7 @@ class contenttype extends \core_contentbank\contenttype {
         // Courses and categories delete their content in bulk. Other courses must keep what they use.
         usage::detach_all($content);
         versions::delete_all($content);
+        captions::delete($content);
         return parent::delete_content($content);
     }
 
@@ -126,6 +127,7 @@ class contenttype extends \core_contentbank\contenttype {
         $moved = parent::move_content($content, $context);
         if ($moved) {
             versions::move_all($from, $context->id, $content->get_id());
+            captions::move($from, $context->id, $content->get_id());
         }
         return $moved;
     }
@@ -138,30 +140,38 @@ class contenttype extends \core_contentbank\contenttype {
 
     #[\Override]
     public function get_view_content(\core_contentbank\content $content): string {
+        global $OUTPUT;
         $html = parent::get_view_content($content);
         $url = $content->get_file_url();
         $file = $content->get_file();
         if (!$url || !$file) {
             return $html;
         }
-        $name = s($content->get_name());
         $extension = strtolower(pathinfo($file->get_filename(), PATHINFO_EXTENSION));
         $mime = self::INLINE_MIMETYPES[$extension] ?? '';
-
-        if (str_starts_with($mime, 'video/')) {
-            $media = \html_writer::tag('video', '', ['src' => $url, 'controls' => 'controls',
-                'preload' => 'metadata', 'class' => 'w-100', 'aria-label' => $name]);
-        } else if (str_starts_with($mime, 'audio/')) {
-            $media = \html_writer::tag('audio', '', ['src' => $url, 'controls' => 'controls',
-                'preload' => 'metadata', 'class' => 'w-100', 'aria-label' => $name]);
-        } else if ($mime === 'application/pdf') {
-            $media = \html_writer::tag('iframe', '', ['src' => $url, 'title' => $name,
-                'class' => 'w-100', 'style' => 'height: 80vh;']);
-        } else if (str_starts_with($mime, 'image/')) {
-            $media = \html_writer::empty_tag('img', ['src' => $url, 'alt' => $name, 'class' => 'img-fluid']);
-        } else {
-            $media = \html_writer::div(get_string('unsupportedpreview', 'contenttype_mediabank'));
-        }
+        $captions = captions::get($content);
+        $captionsurl = $captions ? \moodle_url::make_pluginfile_url(
+            $captions->get_contextid(),
+            'contenttype_mediabank',
+            captions::FILEAREA,
+            $content->get_id(),
+            '/',
+            captions::FILENAME
+        )->out(false) : '';
+        $name = $content->get_name();
+        $media = $OUTPUT->render_from_template('contenttype_mediabank/preview', [
+            'name' => $name,
+            'url' => $url,
+            'isvideo' => str_starts_with($mime, 'video/'),
+            'isaudio' => str_starts_with($mime, 'audio/'),
+            'ispdf' => $mime === 'application/pdf',
+            'isimage' => str_starts_with($mime, 'image/'),
+            'nopreview' => $mime === '',
+            // An image without a text alternative falls back to its name.
+            'alt' => $content->get_alt() ?: $name,
+            'captionsurl' => $captionsurl,
+            'transcript' => $content->get_transcript(),
+        ]);
         return $media . $this->render_usage($content) . $html;
     }
 
@@ -208,7 +218,7 @@ class contenttype extends \core_contentbank\contenttype {
 
     #[\Override]
     protected function get_implemented_features(): array {
-        return [self::CAN_UPLOAD, self::CAN_DOWNLOAD, self::CAN_COPY];
+        return [self::CAN_UPLOAD, self::CAN_DOWNLOAD, self::CAN_COPY, self::CAN_EDIT];
     }
 
     #[\Override]

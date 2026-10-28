@@ -70,8 +70,8 @@ final class upload_rules_test extends \advanced_testcase {
     /**
      * Assert that an action is refused with the given error code.
      *
-     * @param string \$code Expected error code.
-     * @param callable \$action What to try.
+     * @param string $code Expected error code.
+     * @param callable $action What to try.
      */
     protected function assert_refused(string $code, callable $action): void {
         try {

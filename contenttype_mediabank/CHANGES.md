@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.1 (2026-10-29)
+- Security: an item's file is now served only to people who may see the item (access to the media bank in that context, and not someone else's unlisted item). Before, core only checked that the user was logged in, so any logged-in user who knew the URL could fetch any item, unlisted ones included. A refused request gets "file not found".
+
 ## 0.6.0 (2026-10-29)
 - New setting "Include linked files in course backups" (off by default), used by local_mediabank. Makes manual course backups larger by the size of the linked files.
 

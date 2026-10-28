@@ -62,6 +62,12 @@ class contenttype extends \core_contentbank\contenttype {
         $filename = array_pop($args);
         $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
 
+        // Core only checks that the user is logged in. Answer a denial as if the file did not exist, and not with false,
+        // because core would then serve the file as a download anyway.
+        if (!self::can_serve($context, $itemid)) {
+            send_file_not_found();
+        }
+
         $file = get_file_storage()->get_file($context->id, 'contentbank', 'public', $itemid, $filepath, $filename);
         if (!$file || $file->is_directory()) {
             send_file_not_found();
@@ -75,6 +81,25 @@ class contenttype extends \core_contentbank\contenttype {
         header('X-Content-Type-Options: nosniff');
         send_stored_file($file, 0, 0, $forcedownload, $options);
         return true;
+    }
+
+    /**
+     * Whether the current user may be given the file of an item.
+     *
+     * The same rules as for seeing the item: access to the media bank in the context, and an item that is public, the
+     * user's own, or visible to people who may see unlisted content.
+     *
+     * @param \context $context Context named by the URL.
+     * @param int $itemid Item id named by the URL.
+     * @return bool
+     */
+    public static function can_serve(\context $context, int $itemid): bool {
+        global $DB;
+        $record = $DB->get_record('contentbank_content', ['id' => $itemid, 'contenttype' => 'contenttype_mediabank']);
+        if (!$record || (int) $record->contextid !== (int) $context->id) {
+            return false;
+        }
+        return (new self($context))->can_access() && (new content($record))->is_view_allowed();
     }
 
     /**

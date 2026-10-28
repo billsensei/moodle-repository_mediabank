@@ -258,4 +258,30 @@ final class backup_restore_test extends \advanced_testcase {
         $this->assertFalse($applies(backup::MODE_IMPORT));
         $this->assertFalse($applies(backup::MODE_AUTOMATED));
     }
+
+    /**
+     * A backup is not trusted: a content hash that points outside the backup's file pool, or whose file is not what its
+     * hash says, is refused.
+     */
+    public function test_pool_path_refuses_bad_hashes(): void {
+        $this->resetAfterTest();
+        $base = make_request_directory();
+        check_dir_exists($base . '/files/aa');
+        $data = 'real content';
+        $hash = sha1($data);
+        $good = $base . '/files/' . substr($hash, 0, 2) . '/' . $hash;
+        check_dir_exists(dirname($good));
+        file_put_contents($good, $data);
+        // A secret outside the pool, and a pool file whose content does not match its name.
+        file_put_contents($base . '/secret', 'secret');
+        $lie = str_repeat('a', 40);
+        file_put_contents($base . '/files/aa/' . $lie, 'not what the name says');
+
+        $this->assertSame(realpath($good), embedded_links::pool_path($base, $hash));
+        $this->assertNull(embedded_links::pool_path($base, '../../secret'));
+        $this->assertNull(embedded_links::pool_path($base, 'ab/../../secret'));
+        $this->assertNull(embedded_links::pool_path($base, strtoupper($hash)));
+        $this->assertNull(embedded_links::pool_path($base, $lie));
+        $this->assertNull(embedded_links::pool_path($base, str_repeat('b', 40)));
+    }
 }

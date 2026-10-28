@@ -152,7 +152,35 @@ class embedded_links {
      * @param array $data The embedded file element from the backup.
      */
     public static function remember(string $restoreid, array $data): void {
-        \restore_dbops::set_backup_ids_record($restoreid, self::ITEMNAME, (int) $data['aliasid'], 0, null, (object) $data);
+        // The backup file is not trusted: keep only values of the expected shape.
+        $hash = (string) ($data['contenthash'] ?? '');
+        if (!preg_match('/^[0-9a-f]{40}$/', $hash)) {
+            return;
+        }
+        \restore_dbops::set_backup_ids_record($restoreid, self::ITEMNAME, (int) $data['aliasid'], 0, null, (object) [
+            'contenthash' => $hash,
+            'filename' => clean_param((string) ($data['filename'] ?? ''), PARAM_FILE),
+        ]);
+    }
+
+    /**
+     * Path of a file in the backup's pool, or null if the hash is not a content hash or the file is not inside the pool.
+     *
+     * @param string $basepath Folder the backup was unpacked into.
+     * @param string $hash Content hash read from the backup.
+     * @return string|null
+     */
+    public static function pool_path(string $basepath, string $hash): ?string {
+        if (!preg_match('/^[0-9a-f]{40}$/', $hash)) {
+            return null;
+        }
+        $base = realpath($basepath . '/files');
+        $real = realpath($basepath . '/files/' . backup_file_manager::get_backup_content_file_location($hash));
+        if ($base === false || $real === false || strpos($real, $base . DIRECTORY_SEPARATOR) !== 0) {
+            return null;
+        }
+        // A pool file is named after its own hash, so one that does not match is not what the backup claims.
+        return sha1_file($real) === $hash ? $real : null;
     }
 
     /**
@@ -185,8 +213,8 @@ class embedded_links {
                 continue;
             }
             $data = backup_controller_dbops::decode_backup_temp_info($row->info);
-            $pool = $basepath . '/files/' . backup_file_manager::get_backup_content_file_location($data->contenthash);
-            if (!file_exists($pool)) {
+            $pool = self::pool_path($basepath, (string) $data->contenthash);
+            if ($pool === null) {
                 continue;
             }
             $record = (array) $info->newfile;

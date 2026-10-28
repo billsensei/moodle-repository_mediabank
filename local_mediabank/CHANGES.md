@@ -2,6 +2,7 @@
 
 ## 0.2.0 (2026-10-29)
 - Backup and restore of linked files. With the new site setting (contenttype_mediabank "Include linked files in course backups", off by default), manual course backups carry the files behind media bank links in the course's own files and in activities. On restore, a link that core cannot restore (a different site, or the bank file is gone) is created as an ordinary copy; on the same site with the bank file present the link is kept. Import, course copy and automated backups are unchanged.
+- Restore does not trust the backup file: a content hash must be 40 hex characters, the file must sit inside the backup's file pool and must hash to its own name.
 - Limits: links in block and section-summary files are not carried; copies do not keep the item's alt text, transcript or captions; the setting is site-wide because Moodle gives plugins no per-backup option.
 
 ## 0.1.1 (2026-10-27)

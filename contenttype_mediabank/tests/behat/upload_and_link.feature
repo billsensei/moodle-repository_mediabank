@@ -1,4 +1,4 @@
-@core @core_contentbank @contenttype_mediabank @repository_contentbank @javascript @_file_upload
+@core @core_contentbank @contenttype @contenttype_mediabank @repository_contentbank @javascript @_file_upload
 Feature: Upload media to the content bank and use it in a course as a link or a copy
   In order to reuse media across courses
   As a teacher

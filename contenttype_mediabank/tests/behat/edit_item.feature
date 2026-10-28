@@ -1,4 +1,4 @@
-@core @core_contentbank @contenttype_mediabank @javascript
+@core @core_contentbank @contenttype @contenttype_mediabank @javascript
 Feature: Add accessibility information to a media bank item
   In order to make media usable for everyone
   As a teacher

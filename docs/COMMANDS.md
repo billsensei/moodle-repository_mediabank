@@ -140,3 +140,28 @@ How "another site" is simulated: the test changes `$CFG->siteidentifier` for the
 What core does without the setting (measured 2026-10-29): same site, bank file present -> link restored; same site, bank file gone -> file dropped with a
 warning; another site -> the course is restored with no file at all. The first test records the last case.
 Not covered: links in block and section-summary files; a restore into a site that has no Content Bank repository instance.
+
+## Phase 5: web services and file serving (2026-10-29)
+Functions are registered from `db/services.php` on upgrade: bump `version.php`, `php admin/cli/upgrade.php --non-interactive`, then `php public/admin/tool/phpunit/cli/init.php`.
+
+    export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
+    vendor/bin/phpunit public/contentbank/contenttype/mediabank/tests/external_test.php   # OK (8 tests, 41 assertions)
+    vendor/bin/phpunit public/contentbank/contenttype/mediabank/tests/serving_test.php    # OK (3 tests, 12 assertions)
+Whole suite: `OK, but there were issues! Tests: 72, Assertions: 222, PHPUnit Deprecations: 2`.
+Common error: `Class "core_external\tests\externallib_advanced_testcase" not found` (the base class is `\core_external\tests\externallib_testcase`).
+
+Using the functions: add the three functions to an external service (Site administration > Server > Web services > External services), enable
+the REST protocol, give the user `webservice/rest:use`, create a token. Then
+`GET <site>/webservice/rest/server.php?wstoken=TOKEN&wsfunction=contenttype_mediabank_get_items&moodlewsrestformat=json&contextid=N`.
+`fileurl` and `captionsurl` in the result are `webservice/pluginfile.php` addresses; add `?token=TOKEN` to download. Without a token core answers with a JSON
+error (HTTP 200) and does not send the file.
+A course tool lists the course context and the system context separately. The caller needs `moodle/contentbank:access` and
+`contenttype/mediabank:access` in the context asked for; students and teachers of other courses get `errornosuchitem`.
+
+HTTP check done on the dev site with temporary users, a temporary service and tokens (all removed afterwards, `enablewebservices` and
+`webserviceprotocols` put back to `0` and empty): teacher get_items/get_item/get_usage worked, student got `errornosuchitem`, file and captions
+downloaded with the teacher token (200, `application/pdf` inline, `text/vtt`), 404 with the student token.
+
+File serving fix, checked over HTTP with temporary users (`/pluginfile.php/<ctx>/contentbank/public/<id>/<name>`): a public item gives 200 to the
+creator, another teacher and a manager; an unlisted item gives 200 to the creator and a manager and 404 to another teacher. Before the fix another teacher got 200
+for the unlisted item.

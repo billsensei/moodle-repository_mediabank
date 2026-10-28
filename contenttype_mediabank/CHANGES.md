@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0 (2026-10-29)
+- Web service functions (read only): `contenttype_mediabank_get_items` (list a context, filter by kind and name, paged), `contenttype_mediabank_get_item` (one item with file and caption addresses, alt text, transcript) and `contenttype_mediabank_get_usage` (courses that link to an item; managers only; courses the caller cannot see are counted, not named). They are not added to any service; an admin adds them to an external service. They are not in the Moodle mobile app service.
+- Every function checks access to the media bank in the item's context, which core's search does not. A missing item, an item of another type and an item the caller may not see all give the same error. The creator is not returned.
+- Uploading, renaming, copying, visibility and deleting are done with core's own functions (`core_contentbank_*`); deleting a linked item over web services is refused like it is in the screen.
+
 ## 0.6.1 (2026-10-29)
 - Security: an item's file is now served only to people who may see the item (access to the media bank in that context, and not someone else's unlisted item). Before, core only checked that the user was logged in, so any logged-in user who knew the URL could fetch any item, unlisted ones included. A refused request gets "file not found".
 

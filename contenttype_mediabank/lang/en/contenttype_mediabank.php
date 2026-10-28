@@ -58,6 +58,7 @@ $string['usageheading'] = 'Where this item is used';
 $string['usagehidden'] = 'Courses you cannot see: {$a} link(s)';
 $string['usagenone'] = 'No course links to this item.';
 $string['usageother'] = 'Outside courses: {$a} link(s)';
+$string['errornosuchitem'] = 'There is no such media bank item that you can use.';
 $string['errornosuchversion'] = 'Version {$a} of this item does not exist.';
 $string['taskpurgeversions'] = 'Delete expired media bank versions';
 $string['versionretentiondays'] = 'Keep replaced files for (days)';

@@ -104,3 +104,27 @@ Run `init.php` in the background (it takes about 3 minutes with the theme build)
 phpcs: no output, exit 0. Mustache lint (`moodle-plugin-ci mustache -m <moodle> <plugin>`) needs the plugin inside the Moodle tree without a symlink; run on a temporary copy: `Mustache rendered html succesfully`.
 HTTP check of the new URLs on the dev site (login with temporary users, deleted afterwards): captions as manager -> 200, `text/vtt`, `inline`, `nosniff`;
 earlier version as manager -> 200, `attachment`; both as a user without the right, and a wrong caption file name -> 404.
+
+## Phase 5: privacy provider (2026-10-29)
+After changing the provider or its strings: bump `version.php`, `php admin/cli/upgrade.php --non-interactive`, `php public/admin/tool/phpunit/cli/init.php`.
+
+    export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
+    vendor/bin/phpunit public/contentbank/contenttype/mediabank/tests/privacy_provider_test.php
+Expected: `OK (8 tests, 26 assertions)`.
+Whole suite: `OK, but there were issues! Tests: 61, Assertions: 169, PHPUnit Deprecations: 2`.
+Core's compliance test checks every plugin's metadata strings and interfaces: `vendor/bin/phpunit public/privacy/tests/privacy/provider_test.php` -> `OK (1525 tests, 7591 assertions)`.
+Common error: `Test file "public/privacy/tests/provider_test.php" not found` (the file is in `public/privacy/tests/privacy/`).
+
+### moodle-plugin-ci checks on the dev site (symlinked plugins)
+moodle-plugin-ci cannot resolve a symlinked plugin. Swap the symlinks in `public/local/mediabank` and
+`public/contentbank/contenttype/mediabank` for copies, run the checks from the Moodle root, then restore the symlinks:
+
+    PATH=<dir with an npx shim that runs moodle53/node_modules/.bin/$1>:$PATH
+    cd /home/bill/test2/moodle53
+    /home/bill/test2/moodle-plugin-ci/bin/moodle-plugin-ci <phplint|validate|savepoints|mustache|grunt> public/local/mediabank
+Expected: `No syntax error found`, validate exit 0, `Mustache rendered html succesfully`, grunt `Done.`.
+phpdoc: `Invalid component specified in renderer request` (and exit 0, which looks like a pass) means Moodle's component cache does not
+know `local_moodlecheck`. Copy `moodle-plugin-ci/vendor/moodlehq/moodle-local_moodlecheck` to `public/local/moodlecheck`, run
+`php admin/cli/purge_caches.php`, then from `public/` run
+`php local/moodlecheck/cli/moodlecheck.php -p=<comma-separated files> -f=text`. Expected: no `Line` lines. Remove the copy and purge caches again.
+validate also needs `-m /home/bill/test2/moodle53` when run on a copy outside Moodle.

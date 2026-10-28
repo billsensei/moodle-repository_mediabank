@@ -128,3 +128,15 @@ know `local_moodlecheck`. Copy `moodle-plugin-ci/vendor/moodlehq/moodle-local_mo
 `php admin/cli/purge_caches.php`, then from `public/` run
 `php local/moodlecheck/cli/moodlecheck.php -p=<comma-separated files> -f=text`. Expected: no `Line` lines. Remove the copy and purge caches again.
 validate also needs `-m /home/bill/test2/moodle53` when run on a copy outside Moodle.
+
+## Phase 5: backup and restore of links (2026-10-29)
+After adding the backup/restore classes or the setting: bump both `version.php` files (the local plugin depends on the content type's version),
+`php admin/cli/upgrade.php --non-interactive` (expected: `New setting: contenttype_mediabank/embedinbackups`), `php public/admin/tool/phpunit/cli/init.php`.
+
+    export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
+    vendor/bin/phpunit public/local/mediabank/tests/backup_restore_test.php
+Expected: `OK (6 tests, 21 assertions)`, about 1.5 minutes (each test makes and restores a real backup).
+How "another site" is simulated: the test changes `$CFG->siteidentifier` for the restore, which makes core treat the backup as foreign.
+What core does without the setting (measured 2026-10-29): same site, bank file present -> link restored; same site, bank file gone -> file dropped with a
+warning; another site -> the course is restored with no file at all. The first test records the last case.
+Not covered: links in block and section-summary files; a restore into a site that has no Content Bank repository instance.

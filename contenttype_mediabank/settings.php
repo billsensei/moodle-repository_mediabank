@@ -63,6 +63,13 @@ if ($ADMIN->fulltree) {
         ));
     }
 
+    $settings->add(new admin_setting_configcheckbox(
+        'contenttype_mediabank/embedinbackups',
+        get_string('embedinbackups', 'contenttype_mediabank'),
+        get_string('embedinbackups_desc', 'contenttype_mediabank'),
+        0
+    ));
+
     $settings->add(new admin_setting_configtext(
         'contenttype_mediabank/versionretentiondays',
         get_string('versionretentiondays', 'contenttype_mediabank'),

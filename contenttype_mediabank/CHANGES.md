@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.0 (2026-10-29)
+- New setting "Include linked files in course backups" (off by default), used by local_mediabank. Makes manual course backups larger by the size of the linked files.
+
 ## 0.5.0 (2026-10-29)
 - Privacy provider (GDPR). Replaces the "stores no personal data" declaration, which was wrong: alt text, transcripts, captions and earlier versions belong to the person who created the item. Export writes them under the plugin's own folder, so core's export of the item is not overwritten. Delete removes the plugin's files for the user's items, and files whose item row core already deleted, so the result is the same whichever provider runs first.
 - Known gap (policy decision needed): core's own privacy deletion removes an item without calling the content type, so links are not converted to copies first. A link that has been opened keeps its content. A link nobody has opened is left as an empty file in the course.

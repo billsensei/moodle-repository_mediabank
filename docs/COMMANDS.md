@@ -195,3 +195,26 @@ Testing trap found on the way: reading a link's hash or size through the file ob
 what opening a link does. A test that does so cannot tell a synced link from an empty one. Read `files.contenthash` with `$DB->get_field()` instead.
 How a link looks right after it is made: `file_storage::create_file_from_reference()` stores the empty-file hash (`sha1('')`, `da39a3ee...`) unless another link
 to the same file exists, and `files_reference.lastsync` is NULL. `usage::sync_links_to_file()` calls core's `update_references_to_storedfile()`, which updates every link to the file.
+
+## Compatibility matrix, Moodle 5.0 to 5.3 (run 2026-10-29, PHP 8.4.26, MariaDB 11.8)
+Trees: 5.0.11 `moodle/` (no `public/` folder), 5.1.8 `moodle51/`, 5.2.4 `moodle52/`, 5.3 `moodle53/`. Plugins were symlinked in for the run (5.0 into `contentbank/contenttype/mediabank` and `local/mediabank`;
+5.1+ into `public/...`) and the links removed afterwards from 5.0 to 5.2. Nothing was upgraded in the dev databases: PHPUnit and Behat use their own `phpu_` and `bht_` tables.
+
+    cd <tree>; php [public/]admin/tool/phpunit/cli/init.php        # a fresh install of both plugins; about 3 minutes
+    vendor/bin/phpunit --testsuite contenttype_mediabank_testsuite
+    vendor/bin/phpunit [public/]local/mediabank/tests/backup_restore_test.php
+    vendor/bin/phpunit [public/]privacy/tests/privacy/provider_test.php      # core's check of every plugin's privacy provider
+    vendor/bin/phpunit [public/]lib/tests/event/plugin_checks_test.php       # core's check of every event class
+    PHP_CLI_SERVER_WORKERS=4 php -S 127.0.0.1:<behat port> -t <tree>[/public] &   # 5.0 8004, 5.1 8006, 5.2 8008, 5.3 8010
+    php [public/]admin/tool/behat/cli/init.php; vendor/bin/behat --config <behat dataroot>/behatrun/behat/behat.yml --tags=@contenttype_mediabank
+
+| Check | 5.0.11 | 5.1.8 | 5.2.4 | 5.3 |
+|---|---|---|---|---|
+| Plugins install | pass | pass | pass | pass |
+| contenttype suite | 88 tests, 315 assertions | same | same | same |
+| Backup and restore tests | 7 tests, 27 assertions | same | same | same |
+| Core privacy compliance | 1529 tests | 1522 | 1521 | 1525 |
+| Core event structure check | 416 | 414 | 413 | 414 |
+| Behat `@contenttype_mediabank` | 7 scenarios, 151 steps | same | same | same |
+Behat took about 5 minutes per run plus about 3 for the install. Core's totals differ between versions because each version ships a different set of plugins.
+Not covered: PHP 8.3 (not installed here), PostgreSQL (only MariaDB here), the GitHub Actions workflow itself, and the linters (phpcs, phpdoc, mustache, grunt) on each version: they were run on 5.3 only, and 5.2 has no `node_modules`.

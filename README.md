@@ -52,6 +52,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 - [Install guide](docs/INSTALL.md)
 - [Administrator guide](docs/ADMIN-GUIDE.md): settings, scheduled tasks, large files, backup, privacy, web services, what has been tested
 - [Teacher guide](docs/TEACHER-GUIDE.md): upload, link or copy, replace, accessibility, with screenshots
+- [FAQ](docs/FAQ.md): short answers to the questions people ask most
 
 ## Tested
 

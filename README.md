@@ -81,4 +81,4 @@ the commands used to test, build and release, with their results.
 
 ## Licence
 
-Copyright 2026 SenseiMoodle. Released under the GNU General Public License, version 3 or later, the same as Moodle.
+Copyright 2026 SenseiMoodle. Released under the [GNU General Public License](LICENSE), version 3 or later, the same as Moodle.

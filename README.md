@@ -60,6 +60,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 - [Upgrading](docs/UPGRADING.md): how to move to a newer version, and what changes in each
 - [Architecture](docs/ARCHITECTURE.md): how the plugins are built and why, for developers
 - [Development guide](docs/DEVELOPMENT.md): set up, test, check style, build and release
+- [Contributors](docs/CONTRIBUTORS.md): who has helped, and how to be listed
 
 ## Tested
 

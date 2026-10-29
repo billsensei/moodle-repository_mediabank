@@ -1,12 +1,36 @@
-# Commands used in Phase 1
+# Media bank: Commands that were run
 
-Run from `/home/bill/test2/moodle-plugin-ci`. All were run on 2026-10-27 with PHP 8.4.26.
+A dated record of the commands actually run while building the plugins on this machine, with what they printed, the problems met
+and how they were solved. It is a log, so the numbers in a section are the numbers **at that date**; the table below has the
+current ones. For the procedures in the order you would use them, read [DEVELOPMENT.md](DEVELOPMENT.md). The release history is in
+[CHANGELOG.md](../CHANGELOG.md).
 
-## Syntax check
+Paths are this machine's: Moodle trees in `/home/bill/test2/{moodle,moodle51,moodle52,moodle53}` (5.0 has no `public/` folder),
+MariaDB on `127.0.0.1:3307`, and `export LOCPATH=~/.local/locale` in a fresh shell before any PHPUnit or Behat run.
+
+## Current numbers (contenttype 0.11.0, local 0.3.0)
+
+| Check | Result |
+|---|---|
+| `contenttype_mediabank_testsuite` | 118 tests, 507 assertions, on Moodle 5.0, 5.1, 5.2 and 5.3 |
+| `local_mediabank/tests/backup_restore_test.php` | 7 tests, 27 assertions |
+| Behat `@contenttype_mediabank` | 7 scenarios, 151 steps (about 6 minutes) |
+| Core privacy and event checks | pass on 5.0 to 5.3 |
+| In-tree phpcs, `--max-warnings 0` | clean on 5.0 to 5.2 locally; CI runs it on all four |
+| GitHub Actions | 32 jobs: 2 plugins x PHP 8.3, 8.4 x Moodle 5.0 to 5.3 x PostgreSQL, MariaDB |
+
+Sections below that give a smaller number (4, 5, 44, 53, 61, 72, 79, 88, 104 to 109 tests) were right on the day and are kept as
+history. The Behat run for the SVG change (0.11.0) was not repeated, because no browser step changed.
+
+## Phase 1 (2026-10-27): syntax, style, limits
+
+Run from `/home/bill/test2/moodle-plugin-ci`, PHP 8.4.26.
+
+### Syntax check
     for f in $(find /home/bill/test2/mediabank -name '*.php'); do php -l $f; done
 Expected: `No syntax errors detected in <file>` for each file. Any other output is a parse error with a line number.
 
-## Moodle coding standard (phpcs)
+### Moodle coding standard (phpcs)
     P="--runtime-set installed_paths $PWD/vendor/moodlehq/moodle-cs,$PWD/vendor/phpcsstandards/phpcsextra,$PWD/vendor/phpcsstandards/phpcsutils"
     vendor/bin/phpcs $P --standard=moodle /home/bill/test2/mediabank
 Expected when clean: no output, exit code 0.
@@ -14,11 +38,11 @@ Common error: `Cannot redeclare class MoodleHQ\...\AbstractTestCaseSniff`. phpcs
 entry pointing at another copy (`/home/bill/test/moodle-plugin-ci`). The `--runtime-set` above overrides it for one run.
 Auto-fix: replace `phpcs` with `phpcbf`.
 
-## Full moodle-plugin-ci checks (NOT yet run)
-`moodle-plugin-ci install` fetches Moodle and a database, so it needs your approval (download + size). Planned:
-phplint, phpcs, phpdoc, validate, savepoints, mustache, grunt, phpunit, behat, using the matrix in `.github/workflows/ci.yml`.
+### Full moodle-plugin-ci checks
+Later run for real: on the dev site (section "moodle-plugin-ci checks on the dev site") and, for every Moodle and PHP version, by
+`.github/workflows/ci.yml` (see "GitHub Actions run" below).
 
-## Large-file limits to check on a site (Phase 0 finding)
+### Large-file limits to check on a site (Phase 0 finding)
 - Moodle: Site administration > Security > Site security settings > "User quota" (`userquota`, default 100 MB), or give uploaders `moodle/user:ignoreuserquota`.
 - PHP: `upload_max_filesize`, `post_max_size`, `max_execution_time` above 500 MB / upload time.
 - nginx: `client_max_body_size`.
@@ -224,7 +248,7 @@ Build the installable zips and the client bundle (all three files are written to
 
     python3 scripts/build_release.py --out /home/bill/test2/dist
     contenttype_mediabank_<version>.zip   local_mediabank_<version>.zip   mediabank-<release>-bundle.zip
-Each plugin zip has one top folder, `mediabank`. Hidden files are left out. (A stray `phpunit.xml` used to be left out too; it was removed from the repository on 2026-10-29. Its bootstrap path only worked inside a Moodle tree, and the tests run without it.) The bundle holds both zips, the three guides and both change logs; it is **not** installable itself.
+Each plugin zip has one top folder, `mediabank`. Hidden files are left out. (A stray `phpunit.xml` used to be left out too; it was removed from the repository on 2026-10-29. Its bootstrap path only worked inside a Moodle tree, and the tests run without it.) The bundle holds both zips, the guides (install, administrator, teacher, FAQ, troubleshooting, upgrading) with the teacher guide's screenshots, and both change logs; it is **not** installable itself. Which guides go in is the `GUIDES` list in `scripts/build_release.py`.
 The zips are reproducible: the same commit gives the same bytes.
 
 Check a zip the way Moodle's installer does, without installing it. Run it against a site where the plugin is not installed (otherwise the validator also reports that the target folder exists):
@@ -273,3 +297,18 @@ Results after the fix: contenttype suite 108 tests / 407 assertions OK on 5.3; i
 Third automated review finding, valid, fixed: the failure marker rewrote the item's metadata from a copy read when the task started, so an alt text or transcript saved while a large video was being worked on could be lost. `mark_failed()` now re-reads the item,
 checks it still has the file that failed, and writes only if the stored metadata is unchanged since that read (compare-and-set, three tries); I/O errors (`faststart::IO_ERROR`) are not remembered, only files that cannot be changed.
 Results: contenttype suite 109 tests / 410 assertions, local 7 / 27, OK on 5.0, 5.1, 5.2 and 5.3; in-tree phpcs 0 on 5.0, 5.1, 5.2.
+
+## SVG images (2026-10-29, contenttype 0.11.0)
+Requested: allow png, svg, jpg and gif. Decided with Bill: SVG is **opt-in**, off by default (setting `allowsvg`), shown only as a picture, and checked on upload against a list of what is allowed.
+Pieces: `classes/svg_validator.php` (DOM allow-list), `upload_rules::is_svg_allowed()` and `is_svg_acceptable()`, pluginfile serving as a forced download with `contenttype::SVG_HEADERS` (`nosniff` and a `sandbox` Content-Security-Policy).
+
+    export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
+    vendor/bin/phpunit --testsuite contenttype_mediabank_testsuite
+Expected: `OK, but there were issues!` with `Tests: 118, Assertions: 507` on 5.0 to 5.3 (the issues are the doc-comment deprecations noted above).
+Test traps met:
+- The test database keeps the stored default of `allowsvg` from the install. Tests set or unset the config explicitly and call `upload_rules::purge_caches()`.
+- Every test that touches the database resets it (about 10 s each). `svg_validator_test` extends `basic_testcase` and loops over its samples inside one test; avoid data providers for the same reason.
+- PHPUnit cannot force a regular expression to fail through the cached patterns, so the fail-closed helper `svg_validator::found()` is tested directly.
+- A control was used for each rule: with the rule removed, the test for it fails.
+Real files: 67 SVG files that declare `ASCII` as their encoding were refused by the first encoding rule, so the list of accepted encodings was widened; about 97% of ordinary editor-made SVG files now pass.
+Four automated security reviews each found real problems, all fixed before release and listed in `contenttype_mediabank/CHANGES.md` (0.11.0). The last was a regular expression that gave up and was read as "nothing found"; every refusing search now treats failure as a match. The check has had **no manual review**.

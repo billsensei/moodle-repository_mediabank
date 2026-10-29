@@ -22,7 +22,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 PLUGINS = ['contenttype_mediabank', 'local_mediabank']
 SKIP_DIR_NAMES = {'node_modules', 'vendor', '__pycache__'}
-GUIDES = ['INSTALL.md', 'ADMIN-GUIDE.md', 'TEACHER-GUIDE.md', 'FAQ.md', 'TROUBLESHOOTING.md', 'UPGRADING.md',
+GUIDES = ['INSTALL.md', 'ADMIN-GUIDE.md', 'TEACHER-GUIDE.md', 'FAQ.md', 'GLOSSARY.md', 'TROUBLESHOOTING.md', 'UPGRADING.md',
           'Install-Walk-Thru.pdf', 'Use-Walk-Thru.pdf']
 
 

@@ -5,6 +5,8 @@ limits, see the [Administrator guide](ADMIN-GUIDE.md). For day-to-day use, see t
 
 ## The basics
 
+Not sure what a word means? See the [Glossary](GLOSSARY.md).
+
 ### What is it?
 Two Moodle plugins that put videos, audio files, PDFs and pictures in one place, Moodle's **Content bank**, so a file is uploaded
 once and used in many courses. In a course, a teacher picks the file with Moodle's own file picker and chooses to **link** to it

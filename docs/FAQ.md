@@ -172,7 +172,7 @@ items. A site that already had the plugin keeps its saved settings.
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md): it is organised by what you see, with the cause and the fix.
 
 ### I found a bug, or I have an idea.
-Open an issue on GitHub and pick the bug report or feature request form. See [CONTRIBUTING.md](https://github.com/billsensei/moodle-repository_mediabank/blob/main/CONTRIBUTING.md).
+See [SUPPORT.md](SUPPORT.md) for where to ask and what to include. Open an issue on GitHub and pick the bug report or feature request form. See [CONTRIBUTING.md](https://github.com/billsensei/moodle-repository_mediabank/blob/main/CONTRIBUTING.md).
 
 ### I found a security problem.
 Please do **not** use a public issue. Report it privately; see [SECURITY.md](https://github.com/billsensei/moodle-repository_mediabank/blob/main/SECURITY.md).

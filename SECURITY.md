@@ -6,7 +6,7 @@ The Media bank is **Beta** software. Only the newest release of each plugin gets
 
 | Plugin | Supported |
 |---|---|
-| `contenttype_mediabank` | the latest release (0.10.x) |
+| `contenttype_mediabank` | the latest release (0.11.x) |
 | `local_mediabank` | the latest release (0.3.x) |
 
 Fixes are made for Moodle 5.0 to 5.3, the versions the plugins are tested on. Older plugin releases are not patched: upgrade

@@ -56,6 +56,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 - [Teacher guide](docs/TEACHER-GUIDE.md): upload, link or copy, replace, accessibility, with screenshots
 - [FAQ](docs/FAQ.md): short answers to the questions people ask most
 - [Glossary](docs/GLOSSARY.md): what the words mean (item, link, copy, version, unlisted and more)
+- [Getting support](docs/SUPPORT.md): where to ask, and what to include
 - [Troubleshooting](docs/TROUBLESHOOTING.md): what you see, what causes it, what to do
 - [Upgrading](docs/UPGRADING.md): how to move to a newer version, and what changes in each
 - [Architecture](docs/ARCHITECTURE.md): how the plugins are built and why, for developers

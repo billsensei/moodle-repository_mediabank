@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2026-10-29)
+- The command-line tool says "There is no content bank item with id N." for an id that does not exist, instead of Moodle's generic database message.
+- Install zips and guides: see the main repository (`scripts/build_release.py`, `docs/`).
+
 ## 0.2.0 (2026-10-29)
 - Backup and restore of linked files. With the new site setting (contenttype_mediabank "Include linked files in course backups", off by default), manual course backups carry the files behind media bank links in the course's own files and in activities. On restore, a link that core cannot restore (a different site, or the bank file is gone) is created as an ordinary copy; on the same site with the bank file present the link is kept. Import, course copy and automated backups are unchanged.
 - Restore does not trust the backup file: a content hash must be 40 hex characters, the file must sit inside the backup's file pool and must hash to its own name.

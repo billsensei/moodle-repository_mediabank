@@ -43,7 +43,11 @@ if ($unrecognised || $options['help'] || !$options['id']) {
     exit($options['help'] ? 0 : 1);
 }
 
-$content = (new \core_contentbank\contentbank())->get_content_from_id((int) $options['id']);
+try {
+    $content = (new \core_contentbank\contentbank())->get_content_from_id((int) $options['id']);
+} catch (\dml_missing_record_exception $e) {
+    cli_error('There is no content bank item with id ' . (int) $options['id'] . '.');
+}
 if ($content->get_content_type() !== 'contenttype_mediabank') {
     cli_error('Content ' . $options['id'] . ' is not a media bank item.');
 }

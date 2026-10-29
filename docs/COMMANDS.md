@@ -218,3 +218,19 @@ Trees: 5.0.11 `moodle/` (no `public/` folder), 5.1.8 `moodle51/`, 5.2.4 `moodle5
 | Behat `@contenttype_mediabank` | 7 scenarios, 151 steps | same | same | same |
 Behat took about 5 minutes per run plus about 3 for the install. Core's totals differ between versions because each version ships a different set of plugins.
 Not covered: PHP 8.3 (not installed here), PostgreSQL (only MariaDB here), the GitHub Actions workflow itself, and the linters (phpcs, phpdoc, mustache, grunt) on each version: they were run on 5.3 only, and 5.2 has no `node_modules`.
+
+## Release packaging (2026-10-29)
+Build the installable zips and the client bundle (all three files are written to the folder you give; the default is `./dist`):
+
+    python3 scripts/build_release.py --out /home/bill/test2/dist
+    contenttype_mediabank_<version>.zip   local_mediabank_<version>.zip   mediabank-<release>-bundle.zip
+Each plugin zip has one top folder, `mediabank`. The stray `phpunit.xml` in `contenttype_mediabank/` (its bootstrap path only works inside a Moodle tree) and any hidden files are left out. The bundle holds both zips, the three guides and both change logs; it is **not** installable itself.
+The zips are reproducible: the same commit gives the same bytes.
+
+Check a zip the way Moodle's installer does, without installing it. Run it against a site where the plugin is not installed (otherwise the validator also reports that the target folder exists):
+
+    php scripts/validate_plugin_zip.php --moodle=/home/bill/test2/moodle52 --zip=/home/bill/test2/dist/contenttype_mediabank_<version>.zip --component=contenttype_mediabank
+Expected: `[OK]` lines for plugin name, version, required Moodle version, component and release; one `[Warning] Declared maturity level MATURITY_ALPHA`; then `PASS: contenttype_mediabank against Moodle 5.2.4+ ...`. Checked on 5.0, 5.1 and 5.2 for both zips.
+
+Prove a zip is complete (done 2026-10-29): unzip both into a Moodle tree as real folders (not symlinks), run `php public/admin/tool/phpunit/cli/init.php`, then the contenttype suite and `public/local/mediabank/tests/backup_restore_test.php` from the extracted copies, then delete the folders. Result on 5.2.4: 88 tests, 315 assertions and 7 tests, 27 assertions, the same as from the source tree.
+Rollback: `contenttype_mediabank/tests/uninstall_test.php` calls the content type's `uninstall_cleanup()` (what the uninstall runs) and checks that every item is gone and each course kept its file as an ordinary copy, for a form-saved link and a link nobody had opened (`OK (1 test, 17 assertions)`). With link conversion switched off the test fails.

@@ -61,6 +61,8 @@ jobs:
           echo $(cd ci/bin; pwd) >> $GITHUB_PATH
           echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
           sudo locale-gen en_AU.UTF-8
+          # One test decodes a real video before and after it is prepared for streaming. It skips itself without ffmpeg.
+          sudo apt-get install -y --no-install-recommends ffmpeg
           echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
 
       - name: Install moodle-plugin-ci

@@ -64,6 +64,13 @@ if ($ADMIN->fulltree) {
     }
 
     $settings->add(new admin_setting_configcheckbox(
+        'contenttype_mediabank/optimizevideo',
+        get_string('optimizevideo', 'contenttype_mediabank'),
+        get_string('optimizevideo_desc', 'contenttype_mediabank'),
+        1
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
         'contenttype_mediabank/embedinbackups',
         get_string('embedinbackups', 'contenttype_mediabank'),
         get_string('embedinbackups_desc', 'contenttype_mediabank'),

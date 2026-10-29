@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.0 (2026-10-29)
+- New command `php local/mediabank/cli/optimize_videos.php [--dry-run]`: queue the MP4 videos already in the media bank that are not ready for streaming. Needs contenttype_mediabank 0.10.0.
+
 ## 0.2.2 (2026-10-29)
 - Maturity changed from Alpha to **Beta**: released for testing on a copy of your site first.
 - The README now describes the plugin as it is.

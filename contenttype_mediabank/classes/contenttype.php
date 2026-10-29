@@ -122,6 +122,7 @@ class contenttype extends \core_contentbank\contenttype {
         upload_rules::validate($file);
         $content = parent::upload_content($file, $record);
         $content->merge_metadata(upload_rules::describe($file));
+        video_optimizer::queue($content);
         return $content;
     }
 
@@ -132,6 +133,7 @@ class contenttype extends \core_contentbank\contenttype {
         versions::keep_current($content, $file);
         $content = parent::replace_content($file, $content);
         $content->merge_metadata(upload_rules::describe($content->get_file()));
+        video_optimizer::queue($content);
         return $content;
     }
 

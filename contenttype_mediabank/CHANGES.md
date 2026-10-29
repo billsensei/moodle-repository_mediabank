@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.0 (2026-10-29)
+- New: MP4 videos are prepared for streaming. When an MP4 is uploaded or replaced, an ad hoc task moves the file's index (the `moov` box) in front of the picture and sound data, so a browser can start playing before the whole file has downloaded. Nothing is re-encoded: picture and sound are untouched and the file keeps its size. No program such as ffmpeg is needed on the server.
+- The file as uploaded is kept as an earlier version for the retention time (not kept if the retention is 0). Links from courses follow the new file. The item's last editor is not changed.
+- Only plain MP4 files with the index last are changed. Already streamable, fragmented, compressed-index and malformed files are left alone, and a failure leaves the video as it was.
+- New setting "Prepare MP4 videos for streaming" (on by default), and a task "Prepare a media bank video for streaming".
+- Videos uploaded before this version are queued with `local/mediabank/cli/optimize_videos.php` (local_mediabank 0.3.0).
+
 ## 0.9.2 (2026-10-29)
 - No change in behaviour. The language strings are now in alphabetical order and the privacy test is in `tests/privacy/provider_test.php`, as Moodle's current coding standard requires (found by the first GitHub Actions run).
 

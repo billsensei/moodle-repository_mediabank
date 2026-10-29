@@ -250,3 +250,18 @@ copy placed inside a Moodle tree (not a symlink), for example:
     # then delete the two copies
 Used on the committed code it gave CI's exact warnings at the same line numbers; on the fixed code it gives none on 5.0, 5.1 and 5.2.
 Reading CI logs: `gh api .../actions/jobs/<id>/logs` is not available until the whole run has finished; then `gh run view <run> --log-failed` works (add `| sed 's/\x1b\[[0-9;]*m//g'` to strip colours).
+
+## Streaming preparation for MP4 videos (2026-10-29, contenttype 0.10.0, local 0.3.0)
+Requested: "optimize the video for web streaming". Chosen with Bill: fast-start only (no re-encode), background task, replace the file (original kept as a version).
+Design change from the question as asked: the index is moved in **plain PHP** (`classes/faststart.php`, the same algorithm as qt-faststart) instead of calling ffmpeg. Reasons: nothing to install on
+the server, no untrusted upload handed to an external program, no command-line quoting or timeouts. The cost is that the byte shuffling is ours, so it is checked hard: the output must be the same size, with
+`moov` before `mdat` and the same `moov` length; chunk offsets are rewritten (stco and co64); anything unusual (fragmented, compressed index, no index, malformed boxes, 32-bit offset overflow) is left alone.
+Pieces: `classes/video_optimizer.php` (queue, optimize, find_unprepared, queue_all), `classes/task/optimize_video.php` (ad hoc), setting `optimizevideo` (default on), `local_mediabank/cli/optimize_videos.php [--dry-run]`.
+
+Tests (5.3): `tests/faststart_test.php` (8 tests; offsets still point at the same bytes; a control showing uncorrected offsets would miss; extra boxes keep their place; co64; files left alone; damaged table refused;
+and, with ffmpeg present, a real encoded video gives identical `framemd5` before and after) and `tests/video_optimizer_test.php` (7 tests: queue, task, links follow, version kept, last editor kept, setting, queue_all).
+Whole contenttype suite on 5.3: 104 tests, 393 assertions, OK (`--fail-on-warning`); local suite 7 tests, 27 assertions.
+End-to-end on the dev site with a real 20 s H.264/AAC file: upload, `php admin/cli/adhoc_task.php --execute`; before `mdat,moov`, after `moov,mdat`; same 296506 bytes; `framemd5` identical; 1 version kept. Test item then deleted.
+In-tree phpcs (copy in the tree, not symlink) on 5.0, 5.1, 5.2: exit 0. PHPDoc checker on the new files: no findings.
+The CI workflow now installs ffmpeg (one extra step) so the real-video test runs there; without ffmpeg that test skips itself.
+Not done: re-encoding, resolution caps, HLS; `.m4a` audio and `.webm` are not touched; Behat was not re-run locally for this change (no browser step changed).

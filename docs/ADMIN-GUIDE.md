@@ -47,7 +47,20 @@ Behind it:
 | **Maximum PDF size** | 100 MB | |
 | **Maximum image size** | 20 MB | |
 | **Keep replaced files for (days)** | 30 | When an item is replaced, the old file is kept this long so the replacement can be undone. **0 keeps nothing.** |
+| **Prepare MP4 videos for streaming** | On | After an MP4 is uploaded or replaced, cron moves the file's index to the front so playback can start before the whole file has downloaded. See "Streaming" below. |
 | **Include linked files in course backups** | Off | See section 6. |
+
+**Streaming.** Most cameras, phones and editors write an MP4 with its index (the "moov" box) at the *end*. A browser then has to download the whole file, or ask for its end first, before it can start playing; on a slow connection the student sees a long wait. With this setting on, each new or replaced MP4 gets an ad hoc task ("Prepare a media bank video for streaming") that moves the index to the front.
+
+- It does not re-encode anything. Picture and sound are untouched, the file stays exactly the same size, and **nothing needs to be installed on the server** (no ffmpeg). What it does *not* do: shrink files, change codecs or resolution, or make several quality levels. A video that a browser cannot play (for example HEVC in some browsers) is still one it cannot play.
+- It runs when cron runs, so a new video is prepared within a few minutes, not instantly. Until then it is served as uploaded.
+- The file as uploaded is kept as an earlier version for the retention time (see below), so it can be put back. **If you set the retention to 0, the original is not kept.** Links from courses follow the new file, the same as for any replacement.
+- Only MP4 files whose index is last are changed. A file that is already streamable, is fragmented, has a compressed index, or does not look like a normal MP4, is left as it is. A failure is written to the task log and never loses or damages the video: the new file is checked before it replaces anything.
+- The task needs temporary disk space for one extra copy of the video, in Moodle's temp folder.
+- To prepare videos uploaded *before* this version, run this once. It queues the ones that need it, and cron does the rest:
+
+      php local/mediabank/cli/optimize_videos.php --dry-run    # only count them
+      php local/mediabank/cli/optimize_videos.php
 
 **Disk space and versions.** Every kept version takes its full size on disk until it expires. Replacing a 500 MB video holds 500 MB for 30 days. Lower the number of days, or set 0, if disk space is tight.
 
@@ -105,6 +118,8 @@ The smallest of these wins. A large upload that fails with no clear message almo
 |---|---|---|
 | **Delete expired media bank versions** | Daily, 03:17 | Deletes replaced files older than the retention time, and the leftovers of items that were erased. |
 | **Refresh the content of media bank links** | Daily, 03:47 | Makes sure every link carries the item's current file (see section 7). |
+
+There is also an ad hoc task, **Prepare a media bank video for streaming**, which is queued for each uploaded or replaced MP4 (see "Streaming" in section 2). Watch it at **Site administration → Server → Tasks → Ad hoc tasks**, or run the queue by hand with `php admin/cli/adhoc_task.php --execute`. The output says `Media bank item N: optimized`, `nothing` (already streamable or not an MP4), `gone` (the item was replaced or deleted meanwhile) or `failed`.
 
 **After upgrading from an earlier version, run the second task once by hand**, so older links are fixed now and not at 03:47:
 
@@ -204,6 +219,11 @@ Find the id in the address of the item's page in the Content bank (`…/contentb
     $ php local/mediabank/cli/item.php --id=999999
     There is no content bank item with id 999999.
 
+To queue the videos uploaded before streaming preparation existed (section 2):
+
+    $ php local/mediabank/cli/optimize_videos.php --dry-run
+    3 video(s) would be queued.
+
 Run with no arguments to see the options. `--detach` makes every link an independent copy; the item can then be deleted. `--restore` puts a version back, and the file it replaces is kept as a new version.
 
 ## 11. Removing the plugin
@@ -231,7 +251,7 @@ Finally delete the plugin folders from the server (Moodle tells you which). Mood
 
 ## 12. What has been tested, and what has not
 
-**Tested** (PHP 8.4, MariaDB), on **Moodle 5.0.11, 5.1.8, 5.2.4 and 5.3**: a fresh install; 88 automated tests of the content type and 7 of backup and restore; Moodle's own privacy and event checks; and 7 browser scenarios (upload, refused files, link, copy, alt text, transcript). All pass identically on all four versions. A later test of uninstalling (89 tests in all) has been run on 5.3 only. The plugin zips pass Moodle's own installer validation.
+**Tested** (PHP 8.4, MariaDB), on **Moodle 5.0.11, 5.1.8, 5.2.4 and 5.3**: a fresh install; 104 automated tests of the content type and 7 of backup and restore; Moodle's own privacy and event checks; and 7 browser scenarios (upload, refused files, link, copy, alt text, transcript). All pass on all four versions. The 7 browser scenarios were last run before streaming preparation was added; the automated tests were re-run on all four after it. The plugin zips pass Moodle's own installer validation.
 
 **Not tested:**
 - PHP 8.3 (not available on the test machine). PostgreSQL (only MariaDB was available).

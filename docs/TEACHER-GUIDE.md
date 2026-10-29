@@ -19,6 +19,8 @@ The file now appears in the list. Click its name to open its page, where you can
 
 ![The Content bank of the course Biology 101, listing two items, a PNG picture and a PDF, with the Add and Upload buttons above the list.](images/teacher-1-content-bank.png)
 
+**Will my video start quickly?** If your site has it switched on (it is by default), an MP4 video is prepared for streaming a few minutes after you upload it, so students can start watching before the whole file has downloaded. Nothing about the picture or sound changes. It is done by the server in the background; there is nothing for you to do. The file you uploaded is kept as an earlier version (see section 5).
+
 **Which files are allowed?** Videos (mp4, webm), audio (mp3, m4a, ogg), PDFs and images (png, jpg, gif, webp). Your site administrator sets the size limits. By default they are 1 GB for video, 200 MB for audio, 100 MB for PDFs and 20 MB for images.
 
 **Why was my file refused?** The Media bank checks what is *inside* a file, not only its name. You will see a message such as:

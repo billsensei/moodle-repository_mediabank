@@ -42,8 +42,11 @@ final class svg_validator_test extends \basic_testcase {
                 . "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<svg $ns/>",
             'byte order mark' => "\xEF\xBB\xBF<svg $ns/>",
             'style element' => "<svg $ns><style>.a{fill:red;stroke:url(#g)}</style><rect class=\"a\"/></svg>",
-            'style with comment and fragment url' => "<svg $ns><style><![CDATA[ /* url(http://x) */ "
-                . ".a{fill:url(#g)} ]]></style></svg>",
+            'style with a plain comment' => "<svg $ns><style><![CDATA[ /* the colours */ .a{fill:url(#g)} ]]></style></svg>",
+            'declared ascii' => "<?xml version=\"1.0\" encoding=\"ASCII\"?><svg $ns/>",
+            'declared windows-1252' => "<?xml version=\"1.0\" encoding=\"windows-1252\"?><svg $ns/>",
+            'declared iso-8859-1' => "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><svg $ns/>",
+            'declared utf-8 after a byte order mark' => "\xEF\xBB\xBF<?xml version=\"1.0\" encoding=\"utf-8\"?><svg $ns/>",
             'text that looks like handlers' => "<svg $ns><text>Turn on and off, once more, onload = 5</text></svg>",
             'gradients, filters, clip, mask, marker' => "<svg $ns><defs><linearGradient id=\"g\">"
                 . "<stop offset=\"0\"/></linearGradient>"
@@ -100,6 +103,19 @@ final class svg_validator_test extends \basic_testcase {
             'style that loads' => "<svg $ns><style>.a{background:url('https://example.com/a.png')}</style></svg>",
             'style attribute that loads' => "<svg $ns><rect style=\"fill:url(https://example.com/a.svg#p)\"/></svg>",
             'style with an expression' => "<svg $ns><rect style=\"width:expression(alert(1))\"/></svg>",
+            'comment marker inside a string hides a url' => "<svg $ns><style>.a{content:\"/*\"} "
+                . ".b{background:url(https://example.com/a.png)} /* \"*/ </style></svg>",
+            'address in a comment' => "<svg $ns><style>/* url(https://example.com/a.png) */ .a{fill:red}</style></svg>",
+            'css escape for url' => "<svg $ns><style>.a{background:ur\\6c(https://example.com/a.png)}</style></svg>",
+            'css escape in an attribute' => "<svg $ns><rect fill=\"ur\\6c(https://example.com/a.svg#p)\"/></svg>",
+            'css escape, any' => "<svg $ns><style>.a\\:b{fill:red}</style></svg>",
+            'image-set' => "<svg $ns><style>.a{background:image-set('https://example.com/a.png' 1x)}</style></svg>",
+            'src()' => "<svg $ns><style>.a{background:src('https://example.com/a.png')}</style></svg>",
+            'font face' => "<svg $ns><style>@font-face{font-family:x;src:url(https://example.com/a.woff)}</style></svg>",
+            'utf-16 with a byte order mark' => "\xFF\xFE" . mb_convert_encoding("<svg $ns/>", 'UTF-16LE', 'UTF-8'),
+            'utf-16 without one' => mb_convert_encoding("<svg $ns/>", 'UTF-16BE', 'UTF-8'),
+            'utf-16 declared' => "<?xml version=\"1.0\" encoding=\"UTF-16\"?><svg $ns/>",
+            'ebcdic declared' => "<?xml version=\"1.0\" encoding=\"ibm037\"?><svg $ns/>",
             'entity definition' => "<?xml version=\"1.0\"?><!DOCTYPE svg [<!ENTITY a \"b\">]><svg $ns/>",
             'entity definition, odd case' => "<!DOCTYPE svg [<!entity a \"b\">]><svg $ns/>",
             'doctype with an internal subset' => "<!DOCTYPE svg [<!ATTLIST svg x CDATA \"1\">]><svg $ns/>",

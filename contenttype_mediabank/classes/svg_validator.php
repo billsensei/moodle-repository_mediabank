@@ -69,6 +69,11 @@ class svg_validator {
         'feoffset', 'fepointlight', 'fespecularlighting', 'fespotlight', 'fetile', 'feturbulence',
     ];
 
+    /** @var string[] Character encodings accepted: those in which "<" and the letters are the same bytes as in ASCII. */
+    protected const ENCODINGS = [
+        '', 'utf-8', 'utf8', 'ascii', 'us-ascii', 'iso-8859-1', 'iso-8859-15', 'latin1', 'windows-1252', 'cp1252',
+    ];
+
     /** @var string[] Link attributes, in any namespace. */
     protected const LINKS = ['href', 'src'];
 
@@ -85,6 +90,9 @@ class svg_validator {
         if (trim($svg) === '') {
             return 'empty';
         }
+        if (!self::is_ascii_compatible_encoding($svg)) {
+            return 'encoding not allowed';
+        }
         // An entity definition can make a small file expand to a huge one, or read another file. Refuse before parsing.
         if (preg_match('/<!ENTITY/i', $svg)) {
             return 'entity definition';
@@ -98,10 +106,34 @@ class svg_validator {
         if (!$loaded || !$document->documentElement) {
             return 'not well formed';
         }
+        if (!in_array(strtolower((string) $document->xmlEncoding), self::ENCODINGS, true)) {
+            return 'encoding not allowed';
+        }
         if ($document->documentElement->namespaceURI !== self::SVG_NS || $document->documentElement->localName !== 'svg') {
             return 'not an svg element at the top';
         }
         return self::check_node($document);
+    }
+
+    /**
+     * Whether the file is in an encoding where a search of its bytes finds what the XML parser will find.
+     *
+     * A file in UTF-16 or UTF-32, or in a stranger encoding named in its XML declaration, has other bytes for the same text.
+     * Only UTF-8 (with or without a byte order mark), ASCII and the common single-byte Western encodings, or no declaration,
+     * are accepted.
+     *
+     * @param string $svg The file content.
+     * @return bool
+     */
+    protected static function is_ascii_compatible_encoding(string $svg): bool {
+        // Byte order marks of UTF-16 and UTF-32.
+        if (preg_match('/^(\xFF\xFE|\xFE\xFF|\x00\x00\xFE\xFF)/', $svg) || str_contains(substr($svg, 0, 4), "\x00")) {
+            return false;
+        }
+        if (preg_match('/^(?:\xEF\xBB\xBF)?\s*<\?xml[^>]*?encoding\s*=\s*["\']([^"\']+)["\']/i', $svg, $matches)) {
+            return in_array(strtolower($matches[1]), self::ENCODINGS, true);
+        }
+        return true;
     }
 
     /**
@@ -181,6 +213,10 @@ class svg_validator {
         if ($attribute->namespaceURI !== null && !in_array($attribute->namespaceURI, $known, true)) {
             return 'attribute in a namespace not allowed: ' . $attribute->nodeName;
         }
+        // A function written with an escape, such as fill="ur\6c(...)", which a search for "url(" would not find.
+        if (str_contains($value, '\\') && str_contains($value, '(')) {
+            return 'escape in a value with a function call in ' . $name;
+        }
         // A paint or filter reference to another file, such as fill="url(http://...)".
         if (stripos($value, 'url(') !== false && self::css_loads_something($value)) {
             return 'reference to something outside the file in ' . $name;
@@ -221,14 +257,22 @@ class svg_validator {
     }
 
     /**
-     * Whether CSS pulls in anything from outside the file, or uses a form that can run code.
+     * Whether CSS pulls in anything from outside the file, or uses a form that can run code or hide what it does.
+     *
+     * The text is read as it is, with comments left in: stripping them with a pattern can be fooled by a comment marker inside a
+     * quoted string, and a file that mentions an address in a comment is refused along with the rest. A backslash is refused
+     * outright, because CSS escapes (such as ur\6c for "url") let a word be written so that a search does not find it.
      *
      * @param string $css Style rules or the value of a style attribute.
      * @return bool
      */
     protected static function css_loads_something(string $css): bool {
-        $css = preg_replace('/\/\*.*?\*\//s', '', $css);
-        if (preg_match('/@import|expression\s*\(|(java|vb)script\s*:|behaviou?r\s*:|-moz-binding/i', $css)) {
+        if (str_contains($css, '\\')) {
+            return true;
+        }
+        $loaders = '@import|@font-face|@namespace|expression\s*\(|(java|vb)script\s*:|behaviou?r\s*:|-moz-binding'
+            . '|image-set\s*\(|\bsrc\s*\(|\belement\s*\(|\bimage\s*\(|cross-fade\s*\(|\bpaint\s*\(';
+        if (preg_match('/' . $loaders . '/i', $css)) {
             return true;
         }
         // Any url(...) must point inside the file, or be a small embedded picture.

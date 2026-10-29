@@ -144,6 +144,46 @@ final class svg_validator_test extends \basic_testcase {
     }
 
     /**
+     * A long address that does not fit the allowed forms does not hide a later one: the engine is not made to back up until it
+     * gives up, and what is left over is found.
+     */
+    public function test_long_unclosed_address_does_not_hide_a_later_load(): void {
+        $blob = str_repeat('A', 1500000);
+        $svg = '<svg ' . self::NS . '><style>.a{fill:url(data:image/png;base64,' . $blob
+            . '} .b{background:url(https://example.com/x.png)}</style></svg>';
+        $this->assertNotNull(svg_validator::find_problem($svg));
+    }
+
+    /**
+     * When the regular expression engine gives up, a search counts as a match, so a check that refuses on a match refuses.
+     *
+     * Every "refuse if found" test in the validator goes through this method. The settings that make the engine fail are only
+     * seen by patterns compiled after they are set, so a pattern the validator has not used yet is used here.
+     */
+    public function test_a_failure_of_the_regular_expression_engine_counts_as_found(): void {
+        $found = new \ReflectionMethod(svg_validator::class, 'found');
+        $subject = str_repeat('ab', 500) . 'x';
+        $this->assertFalse($found->invoke(null, '/zz[0-9]/', $subject), 'Control: no match is no match.');
+        $this->assertTrue($found->invoke(null, '/x$/', $subject), 'Control: a match is a match.');
+
+        $limit = ini_get('pcre.backtrack_limit');
+        $jit = ini_get('pcre.jit');
+        try {
+            ini_set('pcre.jit', '0');
+            ini_set('pcre.backtrack_limit', '10');
+            $pattern = '/(?:a|b)+$/';
+            // Make sure the engine really fails with these settings, or the test shows nothing.
+            if (@preg_match($pattern, $subject) !== false) {
+                $this->markTestSkipped('The regular expression engine could not be made to fail.');
+            }
+            $this->assertTrue($found->invoke(null, $pattern, $subject), 'A failed search must count as found.');
+        } finally {
+            ini_set('pcre.backtrack_limit', (string) $limit);
+            ini_set('pcre.jit', (string) $jit);
+        }
+    }
+
+    /**
      * A file over the limit is refused without being parsed.
      */
     public function test_oversized_file_is_refused(): void {

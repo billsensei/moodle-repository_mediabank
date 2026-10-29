@@ -94,7 +94,7 @@ class svg_validator {
             return 'encoding not allowed';
         }
         // An entity definition can make a small file expand to a huge one, or read another file. Refuse before parsing.
-        if (preg_match('/<!ENTITY/i', $svg)) {
+        if (self::found('/<!ENTITY/i', $svg)) {
             return 'entity definition';
         }
         $previous = libxml_use_internal_errors(true);
@@ -116,6 +116,21 @@ class svg_validator {
     }
 
     /**
+     * Whether a pattern is found, counting a failure of the regular expression engine as found.
+     *
+     * The engine gives up on some inputs (too much backtracking, too deep). preg_match() then returns false, which a plain
+     * "if it matches, refuse" test reads as "no match", and the file would be let through. Here a failure counts as a match, so
+     * every use of this method that refuses on a match refuses on a failure too.
+     *
+     * @param string $pattern The pattern.
+     * @param string $subject The text to search.
+     * @return bool True if it matches, or if the search could not be completed.
+     */
+    protected static function found(string $pattern, string $subject): bool {
+        return preg_match($pattern, $subject) !== 0;
+    }
+
+    /**
      * Whether the file is in an encoding where a search of its bytes finds what the XML parser will find.
      *
      * A file in UTF-16 or UTF-32, or in a stranger encoding named in its XML declaration, has other bytes for the same text.
@@ -127,13 +142,14 @@ class svg_validator {
      */
     protected static function is_ascii_compatible_encoding(string $svg): bool {
         // Byte order marks of UTF-16 and UTF-32.
-        if (preg_match('/^(\xFF\xFE|\xFE\xFF|\x00\x00\xFE\xFF)/', $svg) || str_contains(substr($svg, 0, 4), "\x00")) {
+        if (self::found('/^(\xFF\xFE|\xFE\xFF|\x00\x00\xFE\xFF)/', $svg) || str_contains(substr($svg, 0, 4), "\x00")) {
             return false;
         }
-        if (preg_match('/^(?:\xEF\xBB\xBF)?\s*<\?xml[^>]*?encoding\s*=\s*["\']([^"\']+)["\']/i', $svg, $matches)) {
-            return in_array(strtolower($matches[1]), self::ENCODINGS, true);
+        $declared = preg_match('/^(?:\xEF\xBB\xBF)?\s*<\?xml[^>]{0,300}?encoding\s*=\s*["\']([^"\']+)["\']/i', $svg, $matches);
+        if ($declared === false) {
+            return false;
         }
-        return true;
+        return $declared === 0 || in_array(strtolower($matches[1]), self::ENCODINGS, true);
     }
 
     /**
@@ -228,7 +244,7 @@ class svg_validator {
             return 'style attribute that loads something';
         }
         // A value that starts like a script address is refused wherever it is.
-        if (preg_match('/^[\s\x00-\x20]*(java|vb)script:/i', $value)) {
+        if (self::found('/^[\s\x00-\x20]*(java|vb)script:/i', $value)) {
             return 'script address in ' . $name;
         }
         return null;
@@ -247,6 +263,9 @@ class svg_validator {
     protected static function link_is_acceptable(string $value, string $element): bool {
         // Browsers ignore white space and control characters inside a scheme, so do the same before looking at it.
         $clean = preg_replace('/[\x00-\x20]+/', '', $value);
+        if ($clean === null) {
+            return false;
+        }
         if ($clean === '' || $clean[0] === '#') {
             return true;
         }
@@ -272,13 +291,15 @@ class svg_validator {
         }
         $loaders = '@import|@font-face|@namespace|expression\s*\(|(java|vb)script\s*:|behaviou?r\s*:|-moz-binding'
             . '|image-set\s*\(|\bsrc\s*\(|\belement\s*\(|\bimage\s*\(|cross-fade\s*\(|\bpaint\s*\(';
-        if (preg_match('/' . $loaders . '/i', $css)) {
+        if (self::found('/' . $loaders . '/i', $css)) {
             return true;
         }
         // Take out every url() of a form that is allowed: a point inside the file, or a small embedded picture. If any url(
         // is left, it is something else, or written in a way that is not understood (unclosed, odd quoting, spaces in the
         // address), and the file is refused. Allowing known forms, and nothing else, leaves no gap to find.
-        $allowed = '/url\(\s*(["\']?)(?:#[A-Za-z0-9_.:-]+|data:image\/(?:png|jpe?g|gif|webp);base64,[A-Za-z0-9+\/=]+)\1\s*\)/i';
-        return preg_match('/url\s*\(/i', preg_replace($allowed, '', $css)) === 1;
+        // The quantifiers are possessive, so a long address that does not fit cannot make the engine back up until it gives up.
+        $allowed = '/url\(\s*(["\']?)(?:#[A-Za-z0-9_.:-]++|data:image\/(?:png|jpe?g|gif|webp);base64,[A-Za-z0-9+\/=]++)\1\s*\)/i';
+        $rest = preg_replace($allowed, '', $css);
+        return $rest === null || self::found('/url\s*\(/i', $rest);
     }
 }

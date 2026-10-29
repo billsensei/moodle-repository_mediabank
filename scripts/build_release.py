@@ -81,6 +81,8 @@ def build_bundle(zips: list, out: Path, timestamp: tuple) -> Path:
                 add(zf, root + guide, source.read_bytes(), timestamp, 0o100644)
             else:
                 print(f'WARNING: docs/{guide} is missing, not in the bundle', file=sys.stderr)
+        for image in sorted((REPO / 'docs' / 'images').glob('*.png')):
+            add(zf, root + 'images/' + image.name, image.read_bytes(), timestamp, 0o100644)
         for plugin, label in (('contenttype_mediabank', 'contenttype'), ('local_mediabank', 'local')):
             source = REPO / plugin / 'CHANGES.md'
             add(zf, root + f'CHANGES-{label}_mediabank.md', source.read_bytes(), timestamp, 0o100644)

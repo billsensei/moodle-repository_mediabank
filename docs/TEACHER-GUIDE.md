@@ -17,6 +17,8 @@ The Media bank lets you upload a video, audio file, PDF or picture **once** and 
 
 The file now appears in the list. Click its name to open its page, where you can play or view it.
 
+![The Content bank of the course Biology 101, listing two items, a PNG picture and a PDF, with the Add and Upload buttons above the list.](images/teacher-1-content-bank.png)
+
 **Which files are allowed?** Videos (mp4, webm), audio (mp3, m4a, ogg), PDFs and images (png, jpg, gif, webp). Your site administrator sets the size limits. By default they are 1 GB for video, 200 MB for audio, 100 MB for PDFs and 20 MB for images.
 
 **Why was my file refused?** The Media bank checks what is *inside* a file, not only its name. You will see a message such as:
@@ -43,6 +45,8 @@ Here the example is a **File** resource.
    - **Make a copy of the file**
 6. Click **Select this file**, then **Save and return to course**.
 
+![The file picker with the item selected. Two choices are shown: Make a copy of the file, and Link to the file, which is selected.](images/teacher-4-link-or-copy.png)
+
 ### Link or copy?
 
 | | **Link to the file** | **Make a copy of the file** |
@@ -63,6 +67,8 @@ Click an item's name in the Content bank. You see the preview, then:
 **Where this item is used** lists the courses that link to it, with the number of links in each, for example *"Course 1: 1 link(s)"*. Courses you are not allowed to see are counted but not named.
 
 If courses link to the item, the page also says: *"This item cannot be deleted while courses link to it."* The **Delete** option is not offered. That protects those courses. To delete the item, first convert the links to copies (see section 6).
+
+![An item page with a preview, the buttons Edit, More and Exit, and the section Where this item is used listing Biology 101 and Chemistry 201 with one link each.](images/teacher-2-item-page.png)
 
 ## 4. Replace a file
 
@@ -103,6 +109,8 @@ An item that courses link to cannot be deleted by hand. Otherwise those courses 
 - **Convert the links to copies, then delete it.** On the item's page, click **Edit**. Under **Links from courses**, tick **Convert all N link(s) to copies** and save. Each course keeps its file as it is now, but **later replacements no longer reach those courses**. *This cannot be undone.* After that you can delete the item.
 
 This option is for people who manage the item (usually the person who uploaded it, and managers). It changes every course that links to it, so check **Where this item is used** first.
+
+![The Edit page of an item with the Accessibility note and the Links from courses section, which has a checkbox to convert all links to copies.](images/teacher-3-edit-form.png)
 
 There is no button to convert only *your* course's link. If you want your course to stop following the bank, pick the item again in the activity and choose **Make a copy of the file**.
 

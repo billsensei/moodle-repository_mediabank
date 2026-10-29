@@ -56,4 +56,4 @@ Never post passwords, tokens or web service keys in an issue.
 
 ## Want to help?
 
-Answering another person's question, improving a guide and testing on your own site all count. See [CONTRIBUTING.md](../CONTRIBUTING.md), and add yourself to [CONTRIBUTORS.md](CONTRIBUTORS.md).
+Answering another person's question, improving a guide and testing on your own site all count. See [CONTRIBUTING.md](../CONTRIBUTING.md), and add yourself to [CONTRIBUTORS.md](CONTRIBUTORS.md). Please follow the [Code of conduct](CODE-OF-CONDUCT.md) when you do.

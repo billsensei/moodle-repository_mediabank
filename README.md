@@ -63,6 +63,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 - [Development guide](docs/DEVELOPMENT.md): set up, test, check style, build and release
 - [Roadmap](docs/ROADMAP.md): where it stands and what might come next
 - [Contributors](docs/CONTRIBUTORS.md): who has helped, and how to be listed
+- [Code of conduct](docs/CODE-OF-CONDUCT.md): the short version, with how to report a problem
 
 ## Tested
 

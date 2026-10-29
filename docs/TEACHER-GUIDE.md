@@ -2,6 +2,8 @@
 
 The Media bank lets you upload a video, audio file, PDF or picture **once** and use it in as many courses as you like. If the file needs correcting, you fix it in one place.
 
+**New to this?** [Use-Walk-Thru.pdf](Use-Walk-Thru.pdf) shows every click, with screenshots.
+
 **In short**
 1. Upload the file to the **Content bank**.
 2. In a course, add it to an activity such as a **File** resource and choose **Link to the file** or **Make a copy of the file**.

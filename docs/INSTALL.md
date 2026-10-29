@@ -2,6 +2,8 @@
 
 The Media bank lets your site keep videos, audio, PDFs and images in one place (the Content bank) and use them in any course, either as a **link** (change the file once and every course gets the new version) or as an **independent copy**.
 
+**Prefer pictures?** [Install-Walk-Thru.pdf](Install-Walk-Thru.pdf) shows every click, with screenshots, for people who do not use the command line.
+
 It is two plugins, installed in this order:
 
 | Order | Plugin | Zip file |

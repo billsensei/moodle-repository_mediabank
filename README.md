@@ -49,6 +49,8 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 
 ## Guides
 
+- [Install walk-through (PDF)](docs/Install-Walk-Thru.pdf): installing from the Moodle screen, step by step with screenshots, no commands
+- [Use walk-through (PDF)](docs/Use-Walk-Thru.pdf): for teachers, step by step with screenshots
 - [Install guide](docs/INSTALL.md)
 - [Administrator guide](docs/ADMIN-GUIDE.md): settings, scheduled tasks, large files, backup, privacy, web services, what has been tested
 - [Teacher guide](docs/TEACHER-GUIDE.md): upload, link or copy, replace, accessibility, with screenshots

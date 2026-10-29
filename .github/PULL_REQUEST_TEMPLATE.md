@@ -21,7 +21,7 @@ PHP version and database used:
 
 ## Checklist
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for the details.
+See [CONTRIBUTING.md](https://github.com/billsensei/moodle-repository_mediabank/blob/main/CONTRIBUTING.md) for the details.
 
 - [ ] A bug fix has a test that fails without the fix. A new feature has tests for what it does and what it must refuse.
 - [ ] `phpcs --standard=moodle` reports nothing, warnings included, and I ran it on a copy **inside** a Moodle tree.
@@ -30,7 +30,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for the details.
 - [ ] If a person's data is stored, the privacy provider and its tests are updated.
 - [ ] `version.php` is raised and `CHANGES.md` has an entry, if this change ships. (`upgrade.php` too, if the database changes.)
 - [ ] The guides in `docs/` are updated, and any screenshot of a changed screen is retaken.
-- [ ] This is not a security problem. Those go through [SECURITY.md](../SECURITY.md), not a pull request.
+- [ ] This is not a security problem. Those go through [SECURITY.md](https://github.com/billsensei/moodle-repository_mediabank/blob/main/SECURITY.md), not a pull request.
 
 ## Anything the reviewer should know
 

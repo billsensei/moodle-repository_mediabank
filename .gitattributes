@@ -1,0 +1,36 @@
+# Text files use LF in the repository and in a checkout, on every system. The plugin zips are built from the working tree, so
+# this keeps their bytes the same wherever they are built.
+* text=auto eol=lf
+
+# Source and documentation.
+*.php text eol=lf
+*.mustache text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.feature text eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+*.vtt text eol=lf
+
+# Never touched or diffed as text. This includes the test fixtures, whose exact bytes the tests depend on
+# (notreally.png is deliberately not a picture).
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+*.pdf binary
+*.mp3 binary
+*.mp4 binary
+*.webm binary
+*.zip binary
+
+# Left out of the archives GitHub makes for a tag or "Download ZIP", and of `git archive`. They are about developing the project, not
+# about using it. The documentation stays in.
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.github export-ignore
+
+# Shown as documentation, not code, in GitHub's language statistics.
+/docs/** linguist-documentation

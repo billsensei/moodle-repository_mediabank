@@ -53,6 +53,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 - [Administrator guide](docs/ADMIN-GUIDE.md): settings, scheduled tasks, large files, backup, privacy, web services, what has been tested
 - [Teacher guide](docs/TEACHER-GUIDE.md): upload, link or copy, replace, accessibility, with screenshots
 - [FAQ](docs/FAQ.md): short answers to the questions people ask most
+- [Troubleshooting](docs/TROUBLESHOOTING.md): what you see, what causes it, what to do
 - [Architecture](docs/ARCHITECTURE.md): how the plugins are built and why, for developers
 - [Development guide](docs/DEVELOPMENT.md): set up, test, check style, build and release
 

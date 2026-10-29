@@ -166,6 +166,9 @@ items. A site that already had the plugin keeps its saved settings.
 
 ## Getting help
 
+### Something does not work.
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md): it is organised by what you see, with the cause and the fix.
+
 ### I found a bug, or I have an idea.
 Open an issue on GitHub and pick the bug report or feature request form. See [CONTRIBUTING.md](https://github.com/billsensei/moodle-repository_mediabank/blob/main/CONTRIBUTING.md).
 

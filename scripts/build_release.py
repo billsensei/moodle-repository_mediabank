@@ -22,7 +22,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 PLUGINS = ['contenttype_mediabank', 'local_mediabank']
 SKIP_DIR_NAMES = {'node_modules', 'vendor', '__pycache__'}
-GUIDES = ['INSTALL.md', 'ADMIN-GUIDE.md', 'TEACHER-GUIDE.md', 'FAQ.md']
+GUIDES = ['INSTALL.md', 'ADMIN-GUIDE.md', 'TEACHER-GUIDE.md', 'FAQ.md', 'TROUBLESHOOTING.md']
 
 
 def read_version(plugin: str) -> tuple[str, str]:

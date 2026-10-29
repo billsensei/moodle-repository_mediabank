@@ -85,7 +85,7 @@ the commands used to test, build and release, with their results.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report a problem, set up a test site, and what a change needs before it is merged.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report a problem, set up a test site, and what a change needs before it is merged. Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Security
 

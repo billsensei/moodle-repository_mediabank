@@ -87,6 +87,10 @@ the commands used to test, build and release, with their results.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report a problem, set up a test site, and what a change needs before it is merged.
 
+## Security
+
+To report a vulnerability privately, see [SECURITY.md](SECURITY.md).
+
 ## Licence
 
 Copyright 2026 SenseiMoodle. Released under the [GNU General Public License](LICENSE), version 3 or later, the same as Moodle.

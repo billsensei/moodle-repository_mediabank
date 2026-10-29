@@ -16,8 +16,8 @@ Open a [GitHub issue](https://github.com/billsensei/moodle-repository_mediabank/
 - the plugin versions (**Site administration → Plugins → Plugins overview**)
 - what you did, what you expected, and what happened, including the exact message Moodle showed
 
-**Security problems.** Do not put details of a vulnerability in a public issue. Open an issue that says you have a security
-report and asks how to send it privately, with no technical detail.
+**Security problems.** Do not put details of a vulnerability in a public issue. Follow [SECURITY.md](SECURITY.md), which reports it
+privately through GitHub.
 
 ## Before you change anything
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0 (2026-10-29)
+- Policy decided by Bill, 2026-10-29: when a person's data is erased, courses that link to media they uploaded keep their file as an ordinary copy. The person's item, its earlier versions, captions, alt text and transcript are erased. This closes the "known gap" in 0.5.0, where a link nobody had opened was left as an empty file.
+- A new link is given the item's content as soon as it is saved. Reading a link through its file object does the same, so a link was empty only until it was first shown; the gap was real but short for most links.
+- The privacy provider refreshes the links to the items it is about to erase, before they go.
+- New daily task "Refresh the content of media bank links" (03:47): brings links that are empty or hold an older version up to date, for links made by a restore and links made before this version. One update per linked item.
+- Still possible, narrowly: a link restored on the same site is empty until something reads it or the daily task runs. If Moodle ever runs core's provider before ours and the erasure comes in that window, that course gets an empty file. Today Moodle runs ours first.
+
 ## 0.8.0 (2026-10-29)
 - Events for what core does not report: `item_linked` (a link to an item is saved in a course or elsewhere; the context is where the link is), `links_converted` (links turned into copies; carries the count; used by the edit form, move and delete) and `version_restored` (carries the version number).
 - `item_linked` uses core's `after_file_created` hook. The link a teacher picks first exists in a draft area and is not reported; the saved link is. Links made by a restore or a course copy are not reported, because core creates those without a hook.

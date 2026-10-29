@@ -17,6 +17,8 @@
 namespace contenttype_mediabank\privacy;
 
 use contenttype_mediabank\captions;
+use contenttype_mediabank\content;
+use contenttype_mediabank\usage;
 use contenttype_mediabank\versions;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
@@ -146,6 +148,7 @@ class provider implements
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
         if (self::is_supported_context($context)) {
+            self::keep_links($context, []);
             get_file_storage()->delete_area_files($context->id, self::COMPONENT);
         }
     }
@@ -199,6 +202,38 @@ class provider implements
     }
 
     /**
+     * Make sure courses that link to the items about to be erased keep their file.
+     *
+     * Erasing an item removes its file. Core turns each link into a copy of what the link holds at that moment, so every
+     * link must hold the item's content first. Links normally do, since they are synced when made and daily; this covers
+     * the ones made since. If core's provider has already erased the items, there is nothing left to do here.
+     *
+     * @param \context $context The context.
+     * @param int[] $userids Creators whose items are erased, or none for every item in the context.
+     */
+    private static function keep_links(\context $context, array $userids): void {
+        global $DB;
+        $select = 'contextid = :contextid AND contenttype = :contenttype';
+        $params = ['contextid' => $context->id, 'contenttype' => self::CONTENTTYPE];
+        if ($userids) {
+            [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            $select .= " AND usercreated $insql";
+            $params += $inparams;
+        }
+        $items = $DB->get_recordset_select('contentbank_content', $select, $params);
+        foreach ($items as $record) {
+            // Erasing the person's data must go ahead even if a link cannot be refreshed.
+            try {
+                usage::sync_links(new content($record));
+            } catch (\Exception $e) {
+                $message = 'Could not refresh the links to media bank item ' . $record->id . ': ' . $e->getMessage();
+                debugging($message, DEBUG_DEVELOPER);
+            }
+        }
+        $items->close();
+    }
+
+    /**
      * Delete the files of the given users' items, and files whose item is already gone.
      *
      * The second part matters because core's provider may have deleted the item rows first, which leaves nothing to
@@ -209,6 +244,7 @@ class provider implements
      */
     private static function delete_files(\context $context, array $userids): void {
         global $DB;
+        self::keep_links($context, $userids);
         $fs = get_file_storage();
         [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
         $itemids = $DB->get_fieldset_select(

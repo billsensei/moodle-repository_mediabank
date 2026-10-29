@@ -95,6 +95,96 @@ class usage {
     }
 
     /**
+     * Make every link to a file carry the file's current content.
+     *
+     * A link nobody has opened is stored without the content of its own, and one that was synced before the item was
+     * replaced carries the old content. Core keeps whatever a link holds when the item is erased or deleted, so this is
+     * what makes a course keep the right file. One call updates all links to the file.
+     *
+     * @param \stored_file $source The file the links point at.
+     * @return int Number of links that were out of date.
+     */
+    public static function sync_links_to_file(\stored_file $source): int {
+        global $DB;
+        $reference = \file_storage::pack_reference([
+            'contextid' => $source->get_contextid(),
+            'component' => $source->get_component(),
+            'filearea' => $source->get_filearea(),
+            'itemid' => $source->get_itemid(),
+            'filepath' => $source->get_filepath(),
+            'filename' => $source->get_filename(),
+        ]);
+        $stale = $DB->count_records_sql(
+            "SELECT COUNT(f.id)
+               FROM {files} f
+               JOIN {files_reference} fr ON fr.id = f.referencefileid
+              WHERE fr.referencehash = :hash AND f.contenthash <> :contenthash",
+            ['hash' => sha1($reference), 'contenthash' => $source->get_contenthash()]
+        );
+        if ($stale) {
+            get_file_storage()->update_references_to_storedfile($source);
+        }
+        return $stale;
+    }
+
+    /**
+     * Make every link to an item carry the item's current content.
+     *
+     * @param \core_contentbank\content $content The item.
+     * @return int Number of links that were out of date.
+     */
+    public static function sync_links(\core_contentbank\content $content): int {
+        $file = $content->get_file();
+        return $file ? self::sync_links_to_file($file) : 0;
+    }
+
+    /**
+     * Do that for every media bank item that has links.
+     *
+     * Used by the daily task, to fix links made before items were synced when linked, and links made by a restore.
+     *
+     * @return int Number of links that were out of date.
+     */
+    public static function sync_all_links(): int {
+        global $DB;
+        $fs = get_file_storage();
+        $total = 0;
+        $references = $DB->get_recordset_sql(
+            "SELECT DISTINCT fr.id, fr.reference
+               FROM {files_reference} fr
+               JOIN {repository_instances} ri ON ri.id = fr.repositoryid
+               JOIN {repository} r ON r.id = ri.typeid
+              WHERE r.type = 'contentbank'"
+        );
+        foreach ($references as $row) {
+            try {
+                $source = \file_storage::unpack_reference($row->reference);
+            } catch (\Exception $e) {
+                continue;
+            }
+            if ($source['component'] !== 'contentbank' || $source['filearea'] !== 'public') {
+                continue;
+            }
+            if (!$DB->record_exists('contentbank_content', ['id' => $source['itemid'], 'contenttype' => 'contenttype_mediabank'])) {
+                continue;
+            }
+            $file = $fs->get_file(
+                $source['contextid'],
+                $source['component'],
+                $source['filearea'],
+                $source['itemid'],
+                $source['filepath'],
+                $source['filename']
+            );
+            if ($file) {
+                $total += self::sync_links_to_file($file);
+            }
+        }
+        $references->close();
+        return $total;
+    }
+
+    /**
      * Turn every link to the item into an independent copy.
      *
      * Used before an item is deleted or moved, so that no course loses the file.

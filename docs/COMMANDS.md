@@ -181,3 +181,17 @@ reference and does call `create_file()`; that is the one `item_linked` reports. 
 the way a teacher does; `link_helper::create_link()` makes links the way a restore does, so it fires nothing.
 The purge task's counts go to the task log: `php admin/cli/scheduled_task.php --execute='\contenttype_mediabank\task\purge_versions'`
 prints `Deleted N expired media bank version(s).` and `Deleted N orphaned caption file(s).`
+
+## Phase 5: erasure policy and link refresh (2026-10-29)
+Policy: erasing a person keeps courses' files as ordinary copies (Bill, 2026-10-29). After upgrading to 0.9.0 run the task once, so links made earlier are fixed now and not at 03:47:
+
+    php admin/cli/scheduled_task.php --execute='\contenttype_mediabank\task\sync_links'
+Expected: `Refreshed N media bank link(s) that were out of date.` then `Scheduled task complete: Refresh the content of media bank links`. A second run says 0.
+
+    export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
+    vendor/bin/phpunit public/contentbank/contenttype/mediabank/tests/erasure_test.php   # OK (9 tests, 58 assertions)
+Whole suite: `OK, but there were issues! Tests: 88, Assertions: 315, PHPUnit Deprecations: 2`.
+Testing trap found on the way: reading a link's hash or size through the file object (`$link->get_contenthash()`, `get_filesize()`) syncs it, which is
+what opening a link does. A test that does so cannot tell a synced link from an empty one. Read `files.contenthash` with `$DB->get_field()` instead.
+How a link looks right after it is made: `file_storage::create_file_from_reference()` stores the empty-file hash (`sha1('')`, `da39a3ee...`) unless another link
+to the same file exists, and `files_reference.lastsync` is NULL. `usage::sync_links_to_file()` calls core's `update_references_to_storedfile()`, which updates every link to the file.

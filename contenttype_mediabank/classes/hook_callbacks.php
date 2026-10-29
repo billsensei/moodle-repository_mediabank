@@ -30,7 +30,8 @@ class hook_callbacks {
     /**
      * Report a new link to a media bank item.
      *
-     * Core calls this for every file created, so it leaves at once for anything that is not a link. Core's file picker
+     * Core calls this for every file created, so it leaves at once for anything that is not a link. A new link is reported
+     * and given the item's content. Core's file picker
      * first makes a link in the user's draft area; the real link is made when the form is saved, and only that one is
      * reported.
      *
@@ -68,9 +69,13 @@ class hook_callbacks {
         if ($item) {
             // Core calls this while it saves a file. A failure to log the link must not stop the file being saved.
             try {
-                item_linked::create_from_link(new content($item), $hook->storedfile)->trigger();
+                $content = new content($item);
+                item_linked::create_from_link($content, $hook->storedfile)->trigger();
+                // Give the link the item's content now. A link nobody has opened would otherwise be empty if the item
+                // were erased, and core keeps whatever the link holds.
+                usage::sync_links($content);
             } catch (\Exception $e) {
-                debugging('Could not log a link to media bank item ' . $item->id . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+                debugging('Could not finish a link to media bank item ' . $item->id . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
             }
         }
     }

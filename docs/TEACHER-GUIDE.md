@@ -17,7 +17,7 @@ The Media bank lets you upload a video, audio file, PDF or picture **once** and 
 
 The file now appears in the list. Click its name to open its page, where you can play or view it.
 
-![The Content bank of the course Biology 101, listing two items, a PNG picture and a PDF, with the Add and Upload buttons above the list.](images/teacher-1-content-bank.png)
+![The Content bank of the course Biology 101 in list view, with the Add and Upload buttons above a table of three items (a picture, a video and a PDF) with columns for places linked, last modified, size, type and author.](images/teacher-1-content-bank.png)
 
 **Will my video start quickly?** If your site has it switched on (it is by default), an MP4 video is prepared for streaming a few minutes after you upload it, so students can start watching before the whole file has downloaded. Nothing about the picture or sound changes. It is done by the server in the background; there is nothing for you to do. The file you uploaded is kept as an earlier version (see section 5).
 
@@ -70,14 +70,16 @@ Click an item's name in the Content bank. You see the preview, then:
 
 If courses link to the item, the page also says: *"This item cannot be deleted while courses link to it."* The **Delete** option is not offered. That protects those courses. To delete the item, first convert the links to copies (see section 6).
 
-![An item page with a preview, the buttons Edit, More and Exit, and the section Where this item is used listing Biology 101 and Chemistry 201 with one link each.](images/teacher-2-item-page.png)
+![An item page for a PDF, with the buttons Edit, More and Exit, a preview of the document, and below it the section Where this item is used.](images/teacher-2-item-page.png)
 
 ## 4. Replace a file
 
 Use this when the file needs correcting and you want every course that links to it to get the fix.
 
 1. Open the item's page.
-2. Choose **Replace with file** and pick the new file.
+2. Open the **More** menu and choose **Replace with file**, then pick the new file.
+
+![The More menu of an item, listing Make unlisted, Rename, Replace with file, Download, Copy content and Delete.](images/teacher-5-more-menu.png)
 3. Save.
 
 Things to know:
@@ -97,6 +99,12 @@ On the item's page, click **Edit**.
 | **Restore an earlier version** | Choose an older file to put back. This changes it for every course that links to the item. The file it replaces is kept, so you can undo the undo. |
 
 Saving shows *"Content updated"*.
+
+This is the Edit page of a video. The text alternative of an image is on the same page, and cannot be left empty:
+
+![The Edit page of a video with a Transcript box, a place to add a WebVTT captions file, and a Versions section with Restore an earlier version and a download link for version 1.](images/teacher-6-edit-video.png)
+
+![The Edit page of a picture with the required Text alternative field filled in.](images/teacher-7-edit-image.png)
 
 > **Important: these are kept with the bank item, not with the course.**
 > A course that links to the file, or holds a copy of it, gets the **bare file**. It does **not** get the captions, text alternative or transcript.

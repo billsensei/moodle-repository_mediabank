@@ -43,6 +43,8 @@ final class svg_validator_test extends \basic_testcase {
             'byte order mark' => "\xEF\xBB\xBF<svg $ns/>",
             'style element' => "<svg $ns><style>.a{fill:red;stroke:url(#g)}</style><rect class=\"a\"/></svg>",
             'style with a plain comment' => "<svg $ns><style><![CDATA[ /* the colours */ .a{fill:url(#g)} ]]></style></svg>",
+            'url forms that are allowed' => "<svg $ns><style>.a{fill:url(#g)} .b{stroke:url( '#h' )} .c{filter:url(\"#f\")} "
+                . ".d{fill:url(#g) none}</style><rect fill=\"url(#g)\"/></svg>",
             'declared ascii' => "<?xml version=\"1.0\" encoding=\"ASCII\"?><svg $ns/>",
             'declared windows-1252' => "<?xml version=\"1.0\" encoding=\"windows-1252\"?><svg $ns/>",
             'declared iso-8859-1' => "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><svg $ns/>",
@@ -109,6 +111,15 @@ final class svg_validator_test extends \basic_testcase {
             'css escape for url' => "<svg $ns><style>.a{background:ur\\6c(https://example.com/a.png)}</style></svg>",
             'css escape in an attribute' => "<svg $ns><rect fill=\"ur\\6c(https://example.com/a.svg#p)\"/></svg>",
             'css escape, any' => "<svg $ns><style>.a\\:b{fill:red}</style></svg>",
+            'url left open at the end of a style' => "<svg $ns><style>.a{background:url(https://example.com/a.png</style></svg>",
+            'url left open in a style attribute' => "<svg $ns><rect style=\"fill:url(https://example.com/a.svg#p\"/></svg>",
+            'url left open in a fill' => "<svg $ns><rect fill=\"url(https://example.com/a.svg#p\"/></svg>",
+            'one url closed, a second left open' => "<svg $ns><style>.a{fill:url(#g)} "
+                . ".b{background:url(https://example.com/a.png</style></svg>",
+            'url with a space in the address' => "<svg $ns><style>.a{fill:url(#g h)}</style></svg>",
+            'url with mismatched quotes' => "<svg $ns><style>.a{fill:url('#g\")}</style></svg>",
+            'url with a fragment and a web address' => "<svg $ns><style>"
+                . ".a{fill:url(#g,https://example.com/a.png)}</style></svg>",
             'image-set' => "<svg $ns><style>.a{background:image-set('https://example.com/a.png' 1x)}</style></svg>",
             'src()' => "<svg $ns><style>.a{background:src('https://example.com/a.png')}</style></svg>",
             'font face' => "<svg $ns><style>@font-face{font-family:x;src:url(https://example.com/a.woff)}</style></svg>",

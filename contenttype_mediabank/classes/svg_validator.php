@@ -275,15 +275,10 @@ class svg_validator {
         if (preg_match('/' . $loaders . '/i', $css)) {
             return true;
         }
-        // Any url(...) must point inside the file, or be a small embedded picture.
-        if (preg_match_all('/url\s*\(\s*([^)]*)\)/i', $css, $matches)) {
-            foreach ($matches[1] as $target) {
-                $target = trim($target, " \t\r\n\"'");
-                if ($target !== '' && $target[0] !== '#' && !preg_match('/^data:image\/(png|jpe?g|gif|webp)[;,]/i', $target)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        // Take out every url() of a form that is allowed: a point inside the file, or a small embedded picture. If any url(
+        // is left, it is something else, or written in a way that is not understood (unclosed, odd quoting, spaces in the
+        // address), and the file is refused. Allowing known forms, and nothing else, leaves no gap to find.
+        $allowed = '/url\(\s*(["\']?)(?:#[A-Za-z0-9_.:-]+|data:image\/(?:png|jpe?g|gif|webp);base64,[A-Za-z0-9+\/=]+)\1\s*\)/i';
+        return preg_match('/url\s*\(/i', preg_replace($allowed, '', $css)) === 1;
     }
 }

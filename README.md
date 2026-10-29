@@ -83,6 +83,10 @@ which is what the plugins were tested on.
 The build is reproducible: the same commit gives the same files. [docs/COMMANDS.md](docs/COMMANDS.md) is a running record of
 the commands used to test, build and release, with their results.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report a problem, set up a test site, and what a change needs before it is merged.
+
 ## Licence
 
 Copyright 2026 SenseiMoodle. Released under the [GNU General Public License](LICENSE), version 3 or later, the same as Moodle.

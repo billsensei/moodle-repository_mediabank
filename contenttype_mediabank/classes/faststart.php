@@ -32,8 +32,20 @@ namespace contenttype_mediabank;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class faststart {
-    /** @var int Largest index (moov box) that will be loaded into memory, in bytes. */
-    public const MAX_MOOV_BYTES = 134217728;
+    /** @var int Largest index (moov box) that will be loaded into memory, in bytes. A feature film needs a few MB. */
+    public const MAX_MOOV_BYTES = 33554432;
+
+    /** @var int Most chunk offsets, over all tracks. The offsets of a ten hour video are a small fraction of this. */
+    protected const MAX_ENTRIES = 4000000;
+
+    /** @var int Most offset tables (tracks). */
+    protected const MAX_TABLES = 256;
+
+    /** @var int Deepest box nesting followed: moov, trak, mdia, minf, stbl. */
+    protected const MAX_DEPTH = 5;
+
+    /** @var int Offsets handled at a time, so no big array is made. */
+    protected const SLICE = 65536;
 
     /** @var int Most top-level boxes read before giving up. A real file has a handful. */
     protected const MAX_TOP_BOXES = 1000;
@@ -190,27 +202,34 @@ class faststart {
      * @throws \RuntimeException If an offset cannot be corrected.
      */
     protected static function shift_offsets(string $moov, int $header, int $insert, int $oldstart, int $shift): string {
-        $found = 0;
-        self::walk($moov, $header, strlen($moov), $insert, $oldstart, $shift, $found);
-        if ($found === 0) {
+        $state = ['patches' => [], 'tables' => 0, 'entries' => 0];
+        self::walk($moov, $header, strlen($moov), [$insert, $oldstart, $shift], 1, $state);
+        if ($state['tables'] === 0) {
             throw new \RuntimeException('The index has no chunk offsets.');
         }
-        return $moov;
+        // Build the corrected box once, from the unchanged pieces and the corrected tables.
+        $result = '';
+        $last = 0;
+        foreach ($state['patches'] as $position => $bytes) {
+            $result .= substr($moov, $last, $position - $last) . $bytes;
+            $last = $position + strlen($bytes);
+        }
+        return $result . substr($moov, $last);
     }
 
     /**
-     * Walk the boxes between two positions, correcting offset tables in place.
+     * Walk the boxes between two positions and work out the corrected offset tables.
      *
-     * @param string $data The moov box, changed in place.
+     * @param string $data The moov box. Not changed.
      * @param int $from First position to read.
      * @param int $to End position.
-     * @param int $insert Where the index will be written.
-     * @param int $oldstart Where the index was.
-     * @param int $shift Size of the index.
-     * @param int $found Number of offset tables corrected.
-     * @throws \RuntimeException If a box is malformed.
+     * @param int[] $move Where the index will be written, where it was, and its size.
+     * @param int $depth How deep this level is.
+     * @param array $state Corrected bytes by position, and counts of what has been seen.
+     * @throws \RuntimeException If a box is malformed or there is more than the limits allow.
      */
-    protected static function walk(string &$data, int $from, int $to, int $insert, int $oldstart, int $shift, int &$found): void {
+    protected static function walk(string $data, int $from, int $to, array $move, int $depth, array &$state): void {
+        [$insert, $oldstart, $shift] = $move;
         $position = $from;
         while ($position + 8 <= $to) {
             $length = unpack('N', substr($data, $position, 4))[1];
@@ -227,17 +246,28 @@ class faststart {
             }
             $end = $position + $length;
             if (in_array($type, self::CONTAINERS, true)) {
-                self::walk($data, $position + $header, $end, $insert, $oldstart, $shift, $found);
+                if ($depth >= self::MAX_DEPTH) {
+                    throw new \RuntimeException('The index is nested too deeply.');
+                }
+                self::walk($data, $position + $header, $end, $move, $depth + 1, $state);
             } else if ($type === 'stco' || $type === 'co64') {
                 $wide = $type === 'co64';
                 $width = $wide ? 8 : 4;
                 $table = $position + $header + 4;
-                $count = unpack('N', substr($data, $table, 4))[1];
-                if ($table + 4 + $count * $width > $end) {
+                $count = $table + 4 <= $end ? unpack('N', substr($data, $table, 4))[1] : PHP_INT_MAX;
+                // The count is checked against what the box really holds before anything is made from it.
+                if ($count > ($end - $table - 4) / $width) {
                     throw new \RuntimeException('Malformed chunk offset table.');
                 }
-                if ($count > 0) {
-                    $values = unpack($wide ? 'J*' : 'N*', substr($data, $table + 4, $count * $width));
+                $state['tables']++;
+                $state['entries'] += $count;
+                if ($state['tables'] > self::MAX_TABLES || $state['entries'] > self::MAX_ENTRIES) {
+                    throw new \RuntimeException('The index has more chunk offsets than is allowed.');
+                }
+                $bytes = '';
+                for ($done = 0; $done < $count; $done += self::SLICE) {
+                    $take = min(self::SLICE, $count - $done);
+                    $values = unpack($wide ? 'J*' : 'N*', substr($data, $table + 4 + $done * $width, $take * $width));
                     foreach ($values as $i => $value) {
                         if ($value >= $insert && $value < $oldstart) {
                             $value += $shift;
@@ -247,10 +277,11 @@ class faststart {
                             $values[$i] = $value;
                         }
                     }
-                    $packed = pack(($wide ? 'J' : 'N') . $count, ...array_values($values));
-                    $data = substr_replace($data, $packed, $table + 4, $count * $width);
+                    $bytes .= pack(($wide ? 'J' : 'N') . $take, ...array_values($values));
                 }
-                $found++;
+                if ($count > 0) {
+                    $state['patches'][$table + 4] = $bytes;
+                }
             }
             $position = $end;
         }

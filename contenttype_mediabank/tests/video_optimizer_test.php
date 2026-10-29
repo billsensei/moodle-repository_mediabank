@@ -172,6 +172,41 @@ final class video_optimizer_test extends \advanced_testcase {
     }
 
     /**
+     * A file that cannot be optimized is left as it is, is not tried again, and is tried once more if it is replaced.
+     */
+    public function test_failed_file_is_not_retried(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $damaged = mp4_builder::build();
+        $damaged = substr_replace($damaged, pack('N', 1000), strpos($damaged, 'stco') + 8, 4);
+        $item = link_helper::create_item('bad.mp4', $damaged);
+        $modified = $DB->get_field('contentbank_content', 'timemodified', ['id' => $item->get_id()]);
+        $this->assertSame(1, $this->queued($item->get_id()));
+        $this->expectOutputRegex('/was left as it is/');
+
+        $this->assertSame(video_optimizer::FAILED, video_optimizer::optimize($item->get_id()));
+
+        $item = new content($DB->get_record('contentbank_content', ['id' => $item->get_id()], '*', MUST_EXIST));
+        $this->assertSame($damaged, $item->get_file()->get_content());
+        $this->assertCount(0, versions::get_versions($item));
+        $this->assertSame((int) $modified, (int) $item->get_content()->timemodified, 'not an edit');
+        $this->assertFalse(video_optimizer::queue($item), 'the same file is not queued again');
+        $this->assertSame(0, video_optimizer::queue_all());
+
+        $draft = get_file_storage()->create_file_from_string([
+            'contextid' => \context_user::instance(get_admin()->id)->id,
+            'component' => 'user',
+            'filearea' => 'draft',
+            'itemid' => file_get_unused_draft_itemid(),
+            'filepath' => '/',
+            'filename' => 'bad.mp4',
+        ], mp4_builder::build());
+        $item = $item->get_content_type_instance()->replace_content($draft, $item);
+        $this->assertTrue(video_optimizer::queue($item), 'a replacement gets its own chance');
+    }
+
+    /**
      * A bank full of older videos can be queued in one go, once, and only the ones that need it.
      */
     public function test_queue_all_finds_only_videos_that_need_it(): void {

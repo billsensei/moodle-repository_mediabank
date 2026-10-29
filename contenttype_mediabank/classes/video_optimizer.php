@@ -41,6 +41,9 @@ class video_optimizer {
     /** Result: the file could not be optimized and was left as it was. */
     public const FAILED = 'failed';
 
+    /** @var string Metadata key holding the content hash of a file that could not be optimized. */
+    protected const FAILED_KEY = 'streamfailed';
+
     /**
      * Whether new videos are optimized. On unless an admin turned it off.
      *
@@ -62,6 +65,30 @@ class video_optimizer {
     }
 
     /**
+     * Whether this very file was tried and could not be optimized, so trying again would only fail again.
+     *
+     * @param \core_contentbank\content $content The item.
+     * @return bool
+     */
+    protected static function has_failed(content $content): bool {
+        $file = $content->get_file();
+        return $file && ($content->get_metadata()[self::FAILED_KEY] ?? null) === $file->get_contenthash();
+    }
+
+    /**
+     * Remember that the item's current file could not be optimized. This is not an edit of the item, so who last changed it
+     * and when are left as they are.
+     *
+     * @param content $content The item.
+     * @param string $hash Content hash of the file that failed.
+     */
+    protected static function mark_failed(content $content, string $hash): void {
+        global $DB;
+        $metadata = array_merge($content->get_metadata(), [self::FAILED_KEY => $hash]);
+        $DB->set_field('contentbank_content', 'configdata', json_encode($metadata), ['id' => $content->get_id()]);
+    }
+
+    /**
      * Ask for an item's video to be optimized when cron next runs. Nothing happens for other kinds of file, or when the
      * setting is off.
      *
@@ -69,7 +96,7 @@ class video_optimizer {
      * @return bool Whether a task was queued.
      */
     public static function queue(\core_contentbank\content $content): bool {
-        if (!self::is_enabled() || !self::is_candidate($content->get_file())) {
+        if (!self::is_enabled() || !self::is_candidate($content->get_file()) || self::has_failed($content)) {
             return false;
         }
         $task = new optimize_video();
@@ -91,7 +118,7 @@ class video_optimizer {
         foreach ($records as $record) {
             $content = new content($record);
             $file = $content->get_file();
-            if (!self::is_candidate($file) || !($handle = $file->get_content_file_handle())) {
+            if (!self::is_candidate($file) || self::has_failed($content) || !($handle = $file->get_content_file_handle())) {
                 continue;
             }
             if (faststart::needs_optimizing($handle, $file->get_filesize())) {
@@ -148,6 +175,7 @@ class video_optimizer {
             faststart::rewrite($handle, $size, $path);
         } catch (\RuntimeException $e) {
             mtrace('Media bank item ' . $contentid . ' was left as it is: ' . $e->getMessage());
+            self::mark_failed($content, $hash);
             return self::FAILED;
         } finally {
             fclose($handle);

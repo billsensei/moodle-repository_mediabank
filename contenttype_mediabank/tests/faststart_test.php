@@ -162,6 +162,65 @@ final class faststart_test extends \advanced_testcase {
     }
 
     /**
+     * A table that claims billions of entries is refused from its size alone, before anything is built from it.
+     */
+    public function test_huge_declared_count_is_refused_cheaply(): void {
+        $data = mp4_builder::build();
+        $at = strpos($data, 'stco') + 8;
+        $data = substr_replace($data, pack('N', 0xFFFFFFFF), $at, 4);
+        $path = make_request_directory() . '/out.mp4';
+        $before = memory_get_peak_usage();
+
+        try {
+            faststart::rewrite($this->stream($data), strlen($data), $path);
+            $this->fail('Expected an exception.');
+        } catch (\RuntimeException $e) {
+            $this->assertFileDoesNotExist($path);
+        }
+        $this->assertLessThan(8 * 1024 * 1024, memory_get_peak_usage() - $before);
+    }
+
+    /**
+     * A table that really holds more offsets than any real video needs is refused without making an array of them.
+     */
+    public function test_more_offsets_than_allowed_are_refused_cheaply(): void {
+        $count = 4000001;
+        $table = mp4_builder::box('stco', pack('N', 0) . pack('N', $count) . str_repeat("\0\0\0\0", $count));
+        $moov = mp4_builder::box('moov', mp4_builder::box('trak', mp4_builder::box('mdia', mp4_builder::box(
+            'minf',
+            mp4_builder::box('stbl', $table)
+        ))));
+        $data = mp4_builder::box('ftyp', 'isom' . pack('N', 0) . 'isom') . mp4_builder::box('mdat', 'xxxx') . $moov;
+        $path = make_request_directory() . '/out.mp4';
+        $before = memory_get_peak_usage();
+
+        try {
+            faststart::rewrite($this->stream($data), strlen($data), $path);
+            $this->fail('Expected an exception.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('more chunk offsets', $e->getMessage());
+        }
+        // The file itself is 16 MB. Building an array of four million integers would take several times that.
+        $this->assertLessThan(48 * 1024 * 1024, memory_get_peak_usage() - $before);
+    }
+
+    /**
+     * Boxes nested far deeper than a real index are refused.
+     */
+    public function test_deep_nesting_is_refused(): void {
+        $inner = mp4_builder::box('stco', pack('N', 0) . pack('N', 0));
+        for ($i = 0; $i < 8; $i++) {
+            $inner = mp4_builder::box('trak', $inner);
+        }
+        $data = mp4_builder::box('ftyp', 'isom' . pack('N', 0) . 'isom') . mp4_builder::box('mdat', 'xxxx')
+            . mp4_builder::box('moov', $inner);
+        $path = make_request_directory() . '/out.mp4';
+
+        $this->expectException(\RuntimeException::class);
+        faststart::rewrite($this->stream($data), strlen($data), $path);
+    }
+
+    /**
      * With ffmpeg available, a real file still decodes to the same pictures after the change.
      */
     public function test_real_file_decodes_the_same(): void {

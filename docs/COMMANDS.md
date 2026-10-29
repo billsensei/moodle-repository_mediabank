@@ -265,3 +265,8 @@ End-to-end on the dev site with a real 20 s H.264/AAC file: upload, `php admin/c
 In-tree phpcs (copy in the tree, not symlink) on 5.0, 5.1, 5.2: exit 0. PHPDoc checker on the new files: no findings.
 The CI workflow now installs ffmpeg (one extra step) so the real-video test runs there; without ffmpeg that test skips itself.
 Not done: re-encoding, resolution caps, HLS; `.m4a` audio and `.webm` are not touched; Behat was not re-run locally for this change (no browser step changed).
+
+Automated security review of the commit found two things, both valid, both fixed: (1) the index limit was 128 MB and a table was unpacked into one PHP array, so a crafted file could exhaust memory with an uncatchable fatal
+error; now 32 MB, at most 4,000,000 offsets in total, at most 256 tables, depth at most 5, offsets handled in slices of 65,536 and the corrected box assembled once. (2) a failure could be retried forever; a file that fails is now marked
+with its content hash (`streamfailed` in the item's metadata, written without counting as an edit) and skipped by queue() and queue_all() until it is replaced. Tests added: oversized table (16 MB file, refused with little memory), deep nesting, failed file not retried.
+Results after the fix: contenttype suite 108 tests / 407 assertions OK on 5.3; in-tree phpcs 0 on 5.0, 5.1, 5.2.

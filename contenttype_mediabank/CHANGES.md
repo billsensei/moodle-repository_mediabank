@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.2 (2026-10-29)
+- No change in behaviour. The language strings are now in alphabetical order and the privacy test is in `tests/privacy/provider_test.php`, as Moodle's current coding standard requires (found by the first GitHub Actions run).
+
 ## 0.9.1 (2026-10-29)
 - Maturity changed from Alpha to **Beta**: released for testing on a copy of your site first.
 - The README now describes the plugin as it is.

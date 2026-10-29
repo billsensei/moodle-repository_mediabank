@@ -35,7 +35,7 @@ use core_privacy\local\request\writer;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(provider::class)]
-final class privacy_provider_test extends \core_privacy\tests\provider_testcase {
+final class provider_test extends \core_privacy\tests\provider_testcase {
     /**
      * Create an item as a user, with alt text, a transcript, a caption file and one earlier version.
      *

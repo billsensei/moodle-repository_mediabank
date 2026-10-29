@@ -109,7 +109,7 @@ earlier version as manager -> 200, `attachment`; both as a user without the righ
 After changing the provider or its strings: bump `version.php`, `php admin/cli/upgrade.php --non-interactive`, `php public/admin/tool/phpunit/cli/init.php`.
 
     export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
-    vendor/bin/phpunit public/contentbank/contenttype/mediabank/tests/privacy_provider_test.php
+    vendor/bin/phpunit public/contentbank/contenttype/mediabank/tests/privacy/provider_test.php
 Expected: `OK (8 tests, 26 assertions)`.
 Whole suite: `OK, but there were issues! Tests: 61, Assertions: 169, PHPUnit Deprecations: 2`.
 Core's compliance test checks every plugin's metadata strings and interfaces: `vendor/bin/phpunit public/privacy/tests/privacy/provider_test.php` -> `OK (1525 tests, 7591 assertions)`.
@@ -234,3 +234,19 @@ Expected: `[OK]` lines for plugin name, version, required Moodle version, compon
 
 Prove a zip is complete (done 2026-10-29): unzip both into a Moodle tree as real folders (not symlinks), run `php public/admin/tool/phpunit/cli/init.php`, then the contenttype suite and `public/local/mediabank/tests/backup_restore_test.php` from the extracted copies, then delete the folders. Result on 5.2.4: 88 tests, 315 assertions and 7 tests, 27 assertions, the same as from the source tree.
 Rollback: `contenttype_mediabank/tests/uninstall_test.php` calls the content type's `uninstall_cleanup()` (what the uninstall runs) and checks that every item is gone and each course kept its file as an ordinary copy, for a form-saved link and a link nobody had opened (`OK (1 test, 17 assertions)`). With link conversion switched off the test fails.
+
+## GitHub Actions run, and why phpcs must be run inside a Moodle tree (2026-10-29)
+First run of `.github/workflows/ci.yml` on branch `ci-beta-0.9.1` (run 40808550604, 32 jobs: 2 plugins x PHP 8.3 and 8.4 x Moodle 5.0 to 5.3 x PostgreSQL and MariaDB).
+Result: the 16 `local_mediabank` jobs passed. The 16 `contenttype_mediabank` jobs failed on one step only, **Moodle Code Checker** (`phpcs --max-warnings 0`):
+7 warnings that the language strings were not in alphabetical order (`moodle.Files.LangFilesOrdering`), and, on Moodle 5.0 only, one warning that
+`tests/privacy_provider_test.php` should be at `tests/privacy/provider_test.php` (`moodle.PHPUnit.TestCaseNames.UnexpectedLevel2NS`).
+Everything else passed in all 32 jobs: PHP lint, PHPDoc, validate, savepoints, mustache, grunt, PHPUnit with `--fail-on-warning`, and Behat (on PHP 8.3 and 8.4, PostgreSQL and MariaDB, 5.0 to 5.3).
+Why the local check missed it: phpcs run on the plugin **outside** a Moodle tree silently skips the sniffs that need to know which plugin a file belongs to. To match CI, run it on a
+copy placed inside a Moodle tree (not a symlink), for example:
+
+    cp -r contenttype_mediabank <moodle>/[public/]contentbank/contenttype/mediabank
+    cp -r local_mediabank       <moodle>/[public/]local/mediabank
+    cd moodle-plugin-ci; vendor/bin/phpcs --runtime-set installed_paths <paths as above> --standard=moodle <the two copies>
+    # then delete the two copies
+Used on the committed code it gave CI's exact warnings at the same line numbers; on the fixed code it gives none on 5.0, 5.1 and 5.2.
+Reading CI logs: `gh api .../actions/jobs/<id>/logs` is not available until the whole run has finished; then `gh run view <run> --log-failed` works (add `| sed 's/\x1b\[[0-9;]*m//g'` to strip colours).

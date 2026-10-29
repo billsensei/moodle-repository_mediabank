@@ -30,7 +30,7 @@ The file now appears in the list. Click its name to open its page, where you can
 | "…content is not the kind of file its name says" | The file is not really what its name says, for example a document renamed to `.png`. | Export it again in the right format. |
 | "…this kind of file is not allowed" | Your site does not accept this kind of file. | Ask your administrator. |
 | "…larger than the limit of …" | The file is too big. | Compress it, or ask your administrator. |
-| "…an SVG file must not contain scripts or other active content" | The SVG has a script or something like it in it. | Export it again as a plain SVG, or as a PNG. |
+| "…an SVG file may contain only a picture…" | The SVG has a script, animation, an embedded page or a link that loads something, or is damaged. | Export it again as a plain SVG, or as a PNG. |
 | "…is empty" | The file has nothing in it. | Check the original and upload again. |
 
 A very large file can also fail because of a limit on the server, and then there may be no clear message. If that happens, ask your administrator to check the upload limits.

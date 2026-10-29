@@ -3,7 +3,7 @@
 ## 0.11.0 (2026-10-29)
 - SVG images are accepted by default for new installs (the setting "Allow SVG images" is now on by default). A site that already had the plugin keeps the choice it saved, which was off.
 - An SVG is shown on the item page as a picture. The file is sent only as a download, with `Content-Security-Policy: sandbox; default-src 'none'` and `nosniff`, so opening its address never runs it as a page.
-- An SVG with scripts, embedded pages, event attributes, `javascript:` or `data:text/html` links, or `<!ENTITY>` is refused on upload and replace, with its own message. This is a second layer on top of the way the file is shown and sent. It is also checked across the boundary of the 1 MB reads, so a large file cannot hide a tag at the join.
+- An SVG is read as XML on upload and replace and refused unless it is only a picture: every element must be on a list of drawing elements (no script, animation, foreignObject or foreign namespaces, however they are prefixed), no `on...` attributes, links only to a `#fragment`, a web or mail address on an anchor or a small embedded png, jpeg, gif or webp on an image, no style rule that loads anything, no processing instructions, no entity definitions. Values are checked after character references are decoded. Files over 2 MB are refused. Class `svg_validator`. This replaces a keyword search that a prefixed `<svg:script>` got past (found by an automated review); the way the file is shown (as an image) and sent (download with a sandbox policy) is still the main protection.
 - The image kind in the settings is now listed as png, jpg, gif, webp and svg.
 
 ## 0.10.0 (2026-10-29)

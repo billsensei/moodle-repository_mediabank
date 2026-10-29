@@ -10,8 +10,9 @@ and the bundle zip attached.
 
 `contenttype_mediabank` 0.11.0 (2026102910), not yet released:
 
-- **SVG images** are accepted by default for new installs, shown as pictures, and sent only as sandboxed downloads. An SVG with scripts
-  or other active content is refused. Sites that already had the plugin keep their saved setting (off).
+- **SVG images** are accepted by default for new installs, shown as pictures, and sent only as sandboxed downloads. An SVG is read as
+  XML and refused unless every element and attribute is on a list of what is allowed (no scripts, animation, embedded pages or
+  links that load anything). Sites that already had the plugin keep their saved setting (off).
 
 Repository and documentation only, no change to the plugins:
 

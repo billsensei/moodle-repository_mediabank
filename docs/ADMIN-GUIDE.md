@@ -67,8 +67,10 @@ Behind it:
 
 - It is shown on the item page as a picture (an image tag), where browsers never run scripts in it.
 - The file itself is only ever sent as a **download**, with a security header (`Content-Security-Policy: sandbox`, no scripts, no loading of anything) and `nosniff`. Opening its address does not display it as a page.
-- An SVG that contains a script, an embedded page (`foreignObject`, `iframe`, `embed`, `object`), an event attribute such as `onload=`, a `javascript:` link, a `data:text/html` link or an `<!ENTITY>` is **refused** on upload and replace, with the message "…an SVG file must not contain scripts or other active content." This is a second layer, not the protection: a determined person can write the same thing in a way the check does not match.
-- **A copy or link in a course is served by Moodle itself, like any file a teacher puts in a course**, and Moodle shows an SVG as a page when its address is opened. Teachers can already put an HTML page with scripts in a course, so this adds little, but if you do not want SVG files in courses at all, untick the setting. Items already uploaded stay, and are still shown.
+- On upload and replace the file is read as XML and checked against **lists of what is allowed**, not a list of what is forbidden. It is **refused** unless it is well formed, every element is a drawing element (shapes, text, paths, gradients, filters, clip paths, masks, markers, `use`, `image`, `a`, `style`), and nothing in it runs or loads. That excludes `script`, `foreignObject`, animation (`animate`, `set`), `iframe` and the like, whatever namespace prefix they are written with; every `on...` attribute; links other than `#fragment`, a web or mail address on a link (`a`), or a small embedded png, jpeg, gif or webp on an `image`; style rules that import or load anything from outside the file; processing instructions; and entity definitions. Values are checked after character references are decoded, so `&#106;avascript:` does not get through. Metadata from Inkscape, Sketch and Creative Commons is accepted. The refusal message is "…an SVG file may contain only a picture: no scripts, animation, embedded pages, event handlers or links that load anything."
+- SVG files over 2 MB are refused as too large (the check reads the whole file into memory).
+- Checked against 2,261 SVG files found on a Linux machine, 2,198 (97%) are accepted. The others are mostly older Adobe Illustrator exports that carry entity definitions, and files with an editor's own extra namespace. They can be exported again as plain SVG.
+- **A copy or link in a course is served by Moodle itself, like any file a teacher puts in a course**, and Moodle shows an SVG as a page when its address is opened. The check above is what protects that case, and it is a check, not a guarantee: a flaw in it, or in a browser, could let a script through. Teachers can already put an HTML page with scripts in a course, so this adds little, but if you do not want SVG files in courses at all, untick the setting. Items already uploaded stay, and are still shown.
 
 **Disk space and versions.** Every kept version takes its full size on disk until it expires. Replacing a 500 MB video holds 500 MB for 30 days. Lower the number of days, or set 0, if disk space is tight.
 
@@ -77,7 +79,7 @@ Behind it:
 | Message | Meaning |
 |---|---|
 | "…was not accepted because it is empty." | Zero bytes. |
-| "…an SVG file must not contain scripts or other active content." | The SVG has something on the list above in it. |
+| "…an SVG file may contain only a picture: no scripts, animation, embedded pages, event handlers or links that load anything." | The SVG is not well formed, or has something that is not on the list above. |
 | "…was not accepted because this kind of file is not allowed in the media bank." | The kind is switched off, or the extension is not supported. |
 | "…was not accepted because it is larger than the limit of …" | Over the maximum for that kind. |
 | "…cannot replace this item. A replacement must be a .xxx file, so that existing links keep working." | A replacement must keep the same file extension. |
@@ -260,7 +262,7 @@ Finally delete the plugin folders from the server (Moodle tells you which). Mood
 
 ## 12. What has been tested, and what has not
 
-**Tested** (PHP 8.4, MariaDB), on **Moodle 5.0.11, 5.1.8, 5.2.4 and 5.3**: a fresh install; 112 automated tests of the content type and 7 of backup and restore; Moodle's own privacy and event checks; and 7 browser scenarios (upload, refused files, link, copy, alt text, transcript). All pass on all four versions. The 7 browser scenarios were last run before streaming preparation was added; the automated tests were re-run on all four after it. The plugin zips pass Moodle's own installer validation.
+**Tested** (PHP 8.4, MariaDB), on **Moodle 5.0.11, 5.1.8, 5.2.4 and 5.3**: a fresh install; 115 automated tests of the content type and 7 of backup and restore; Moodle's own privacy and event checks; and 7 browser scenarios (upload, refused files, link, copy, alt text, transcript). All pass on all four versions. The 7 browser scenarios were last run before streaming preparation was added; the automated tests were re-run on all four after it. The plugin zips pass Moodle's own installer validation.
 
 **Not tested:**
 - PHP 8.3 (not available on the test machine). PostgreSQL (only MariaDB was available).

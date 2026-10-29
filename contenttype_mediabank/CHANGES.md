@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1 (2026-10-29)
+- Maturity changed from Alpha to **Beta**: released for testing on a copy of your site first.
+- The README now describes the plugin as it is.
+
 ## 0.9.0 (2026-10-29)
 - Policy decided by Bill, 2026-10-29: when a person's data is erased, courses that link to media they uploaded keep their file as an ordinary copy. The person's item, its earlier versions, captions, alt text and transcript are erased. This closes the "known gap" in 0.5.0, where a link nobody had opened was left as an empty file.
 - A new link is given the item's content as soon as it is saved. Reading a link through its file object does the same, so a link was empty only until it was first shown; the gap was real but short for most links.

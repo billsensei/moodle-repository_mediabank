@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 (2026-10-29)
+- Maturity changed from Alpha to **Beta**: released for testing on a copy of your site first.
+- The README now describes the plugin as it is.
+
 ## 0.2.1 (2026-10-29)
 - The command-line tool says "There is no content bank item with id N." for an id that does not exist, instead of Moodle's generic database message.
 - Install zips and guides: see the main repository (`scripts/build_release.py`, `docs/`).

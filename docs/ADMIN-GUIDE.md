@@ -242,7 +242,7 @@ Finally delete the plugin folders from the server (Moodle tells you which). Mood
 - Linting (code style) on Moodle 5.0 to 5.2.
 
 **Known limits:**
-- Both plugins are marked **Alpha**.
+- Both plugins are marked **Beta**: released for testing. Try them on a copy of your site first.
 - Alt text, transcripts and captions live with the bank item. A course that **links** or **copies** the file gets the bare file. They show on the item's page in the Content bank.
 - There is no button for a teacher to convert just *their* course's link into a copy. They can pick the item again and choose **Make a copy of the file**. A manager can convert all links from the item's Edit page.
 - A PDF cannot be checked for accessibility tags by the plugin.

@@ -19,9 +19,9 @@ The second one needs the first, so install them in that order. Do not unzip anyt
 - You must be a site administrator.
 - Your host must allow installing plugins from the Moodle screen. If it does not, use "Installing by hand" below.
 
-## About the "Alpha" warning
+## About the "Beta" label
 
-This is an early release. Both plugins are marked **Alpha**, so Moodle shows a warning that the plugin is not yet considered stable. That is expected. It does not stop the installation. Try the plugin on a test copy of your site first.
+Both plugins are marked **Beta**. That means they are released for testing, not yet called stable, so Moodle may show a warning about it. That is expected and does not stop the installation. Try the plugin on a test copy of your site first.
 
 ## Installing from the Moodle screen
 
@@ -32,7 +32,7 @@ Do these steps once for each zip, **content type first**.
 3. Under **Install plugin from ZIP file**, drop the zip into the **ZIP package** box (or choose it).
 4. Leave **Plugin type** on its automatic setting if you see it. Moodle recognises these plugins by itself.
 5. Click **Install plugin from the ZIP file**.
-6. Moodle checks the file and shows **Validation successful, installation can continue**. Click **Continue**. The only warning you should see is the Alpha one.
+6. Moodle checks the file and shows **Validation successful, installation can continue**. Click **Continue**. The only warning you should see is the Beta one.
 7. Click **Upgrade Moodle database now**, then **Continue**.
 8. On the next screen Moodle shows the plugin's settings. The defaults are fine. Click **Save changes**.
 

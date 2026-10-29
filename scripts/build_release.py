@@ -21,8 +21,6 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 PLUGINS = ['contenttype_mediabank', 'local_mediabank']
-# Files that belong to the repository but not in a release.
-SKIP_AT_PLUGIN_ROOT = {'phpunit.xml'}
 SKIP_DIR_NAMES = {'node_modules', 'vendor', '__pycache__'}
 GUIDES = ['INSTALL.md', 'ADMIN-GUIDE.md', 'TEACHER-GUIDE.md']
 
@@ -45,7 +43,7 @@ def included(plugin_dir: Path):
         parts = relative.parts
         if any(part.startswith('.') or part in SKIP_DIR_NAMES for part in parts):
             continue
-        if path.suffix == '.zip' or (len(parts) == 1 and parts[0] in SKIP_AT_PLUGIN_ROOT):
+        if path.suffix == '.zip':
             continue
         yield path, relative
 

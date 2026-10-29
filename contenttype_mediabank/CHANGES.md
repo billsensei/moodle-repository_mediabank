@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Removed an unused import from the privacy provider.
 - A transcript may have at most 100,000 characters (`content::MAX_TRANSCRIPT_LENGTH`). The edit form refuses a longer one. Before, there was no limit. Found by a security review (hardening).
 
 ## 0.11.0 (2026-10-29)

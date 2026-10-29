@@ -169,6 +169,7 @@ What is not carried: links inside blocks and section summaries; and a copy loses
 |---|---|
 | Their bank items, earlier versions, captions, alt text and transcripts | The file inside each course that used the media |
 
+- **An item belongs to the person who created it, as in Moodle's own Content bank.** Erasure and export follow the creator. If someone else later edited the item (added a transcript, replaced the file), that edit is not tied to them and stays with the item. The files kept with an item carry no user id.
 - Data export includes the person's alt text, transcripts, captions and earlier versions, under the Media bank's own folder.
 - The courses' copies are treated as course content. If a particular recording shows a person who has asked for erasure, find the courses from the item's **Where this item is used** panel (or the command-line tool) and remove the file there yourself.
 - To keep courses safe, every link is given the item's content when it is created, again just before an erasure, and by the daily task above.

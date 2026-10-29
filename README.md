@@ -73,6 +73,10 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 
 ## Building the release files
 
+`composer.json` describes the project and gives shortcuts (`composer build`, `composer validate-zip`). It is not an installable
+Composer package: install the plugins from the zip files, content type first. It has no dependencies other than PHP 8.3 or later,
+which is what the plugins were tested on.
+
     python3 scripts/build_release.py --out dist
     php scripts/validate_plugin_zip.php --moodle=/path/to/moodle --zip=dist/<plugin zip> --component=contenttype_mediabank
 

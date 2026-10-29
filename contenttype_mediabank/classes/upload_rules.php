@@ -83,14 +83,13 @@ class upload_rules {
     }
 
     /**
-     * Whether SVG files may be stored. On unless an admin turned it off. They are checked when stored, and never served as a
+     * Whether SVG files may be stored. Off unless an admin turned it on. They are checked when stored, and never served as a
      * page: the preview is an image, and the file itself is only sent as a download.
      *
      * @return bool
      */
     public static function is_svg_allowed(): bool {
-        $setting = get_config('contenttype_mediabank', 'allowsvg');
-        return $setting === false || $setting === null || $setting === '' ? true : (bool) $setting;
+        return (bool) get_config('contenttype_mediabank', 'allowsvg');
     }
 
     /**

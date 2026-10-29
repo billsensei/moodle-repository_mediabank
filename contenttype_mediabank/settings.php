@@ -49,7 +49,7 @@ if ($ADMIN->fulltree) {
         'contenttype_mediabank/allowsvg',
         get_string('allowsvg', 'contenttype_mediabank'),
         get_string('allowsvg_desc', 'contenttype_mediabank'),
-        1
+        0
     );
     $setting->set_updatedcallback($purge);
     $settings->add($setting);

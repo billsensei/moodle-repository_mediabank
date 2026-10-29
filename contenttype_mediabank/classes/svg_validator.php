@@ -145,11 +145,19 @@ class svg_validator {
         if (self::found('/^(\xFF\xFE|\xFE\xFF|\x00\x00\xFE\xFF)/', $svg) || str_contains(substr($svg, 0, 4), "\x00")) {
             return false;
         }
-        $declared = preg_match('/^(?:\xEF\xBB\xBF)?\s*<\?xml[^>]{0,300}?encoding\s*=\s*["\']([^"\']+)["\']/i', $svg, $matches);
-        if ($declared === false) {
+        // The XML declaration, if there is one, taken whole and without backing up.
+        $found = preg_match('/^(?:\xEF\xBB\xBF)?\s*(<\?xml[^>]*+>)/i', $svg, $declaration);
+        if ($found === false) {
             return false;
         }
-        return $declared === 0 || in_array(strtolower($matches[1]), self::ENCODINGS, true);
+        if ($found === 0 || stripos($declaration[1], 'encoding') === false) {
+            return true;
+        }
+        // It names an encoding. If the name cannot be read, the file is refused.
+        if (preg_match('/encoding\s*=\s*["\']([^"\']*+)["\']/i', $declaration[1], $named) !== 1) {
+            return false;
+        }
+        return in_array(strtolower($named[1]), self::ENCODINGS, true);
     }
 
     /**

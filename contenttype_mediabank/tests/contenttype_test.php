@@ -27,7 +27,7 @@ namespace contenttype_mediabank;
  */
 final class contenttype_test extends \advanced_testcase {
     /**
-     * The content type manages all four media kinds, SVG included, and SVG is never served inline.
+     * The content type manages all four media kinds. SVG is managed only when an admin allows it, and is never served inline.
      */
     public function test_manageable_extensions(): void {
         $this->resetAfterTest();
@@ -38,8 +38,12 @@ final class contenttype_test extends \advanced_testcase {
         foreach (['.mp4', '.mp3', '.pdf', '.png'] as $expected) {
             $this->assertContains($expected, $extensions);
         }
-        $this->assertContains('.svg', $extensions);
+        $this->assertNotContains('.svg', $extensions, 'SVG is off by default.');
         $this->assertArrayNotHasKey('svg', contenttype::INLINE_MIMETYPES);
+
+        set_config('allowsvg', 1, 'contenttype_mediabank');
+        upload_rules::purge_caches();
+        $this->assertContains('.svg', (new contenttype(\context_system::instance()))->get_manageable_extensions());
     }
 
     /**
@@ -98,7 +102,7 @@ final class contenttype_test extends \advanced_testcase {
         ], '<html><script>alert(1)</script></html>');
         $this->assertFalse($method->invoke(null, $html, 'png'));
 
-        unset_config('allowsvg', 'contenttype_mediabank');
+        set_config('allowsvg', 1, 'contenttype_mediabank');
         upload_rules::purge_caches();
         $svg = $this->upload_item('x.svg', '<svg xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1"/></svg>');
         $this->assertFalse($method->invoke(null, $svg->get_file(), 'svg'));

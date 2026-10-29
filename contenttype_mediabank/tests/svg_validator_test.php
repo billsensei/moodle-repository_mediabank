@@ -184,6 +184,20 @@ final class svg_validator_test extends \basic_testcase {
     }
 
     /**
+     * The XML declaration is read whole, however long, so a long declaration cannot push the encoding out of sight.
+     */
+    public function test_encoding_is_read_from_a_long_declaration(): void {
+        $check = new \ReflectionMethod(svg_validator::class, 'is_ascii_compatible_encoding');
+        $padding = str_repeat(' ', 500);
+        $this->assertFalse($check->invoke(null, "<?xml version=\"1.0\"$padding encoding=\"UTF-16\"?><svg/>"));
+        $unreadable = "<?xml version=\"1.0\" encoding=?><svg/>";
+        $this->assertFalse($check->invoke(null, $unreadable), 'A name that cannot be read is refused.');
+        $this->assertTrue($check->invoke(null, "<?xml version=\"1.0\"$padding encoding=\"UTF-8\"?><svg/>"));
+        $this->assertTrue($check->invoke(null, '<?xml version="1.0"?><svg/>'));
+        $this->assertTrue($check->invoke(null, '<svg/>'));
+    }
+
+    /**
      * A file over the limit is refused without being parsed.
      */
     public function test_oversized_file_is_refused(): void {

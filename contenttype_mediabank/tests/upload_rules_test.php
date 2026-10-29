@@ -203,13 +203,18 @@ final class upload_rules_test extends \advanced_testcase {
     }
 
     /**
-     * SVG is accepted by default and is never served inline. An admin can switch it off.
+     * SVG is off by default, is accepted once an admin turns it on, and is never served inline.
      */
-    public function test_svg_accepted_by_default_and_never_inline(): void {
+    public function test_svg_off_by_default_and_never_inline(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         // A site that has never saved the setting, as a new install is before anyone opens the page.
         unset_config('allowsvg', 'contenttype_mediabank');
+        upload_rules::purge_caches();
+        $this->assertFalse(upload_rules::is_svg_allowed());
+        $this->assert_refused('errornotallowed', fn() => $this->upload('x.svg', media_samples::get('svg')));
+
+        set_config('allowsvg', 1, 'contenttype_mediabank');
         upload_rules::purge_caches();
         $this->assertTrue(upload_rules::is_svg_allowed());
         $content = $this->upload('x.svg', media_samples::get('svg'));
@@ -218,6 +223,7 @@ final class upload_rules_test extends \advanced_testcase {
         $this->assertFalse($method->invoke(null, $content->get_file(), 'svg'));
 
         set_config('allowsvg', 0, 'contenttype_mediabank');
+        upload_rules::purge_caches();
         $this->assertFalse(upload_rules::is_svg_allowed());
         $this->assert_refused('errornotallowed', fn() => $this->upload('y.svg', media_samples::get('svg')));
     }

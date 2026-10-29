@@ -40,8 +40,8 @@ Behind it:
 
 | Setting | Default | What it does |
 |---|---|---|
-| **Allowed file kinds** | All four | Which kinds can be uploaded: Video (mp4, webm), Audio (mp3, m4a, ogg), PDF documents, Images (png, jpg, gif, webp; and svg, see below). Items already uploaded stay available if you untick a kind. |
-| **Allow SVG images** | On for new installs | See "SVG files" below. A site that already had the plugin keeps its saved choice (which was off), so tick it there if you want SVG. |
+| **Allowed file kinds** | All four | Which kinds can be uploaded: Video (mp4, webm), Audio (mp3, m4a, ogg), PDF documents, Images (png, jpg, gif, webp; svg only if allowed, see below). Items already uploaded stay available if you untick a kind. |
+| **Allow SVG images** | **Off** | See "SVG files" below. Tick it only if you want SVG files in the media bank. |
 | **Maximum video size** | 1 GB | Largest video accepted. |
 | **Maximum audio size** | 200 MB | |
 | **Maximum PDF size** | 100 MB | |
@@ -63,7 +63,7 @@ Behind it:
       php local/mediabank/cli/optimize_videos.php --dry-run    # only count them
       php local/mediabank/cli/optimize_videos.php
 
-**SVG files.** An SVG is a picture, but it is also a small program: it can contain scripts, and a script that runs on your Moodle address could act as the person who opened it. So SVG is handled differently from other pictures:
+**SVG files.** SVG is **off by default** in this release. The check described here has been through several rounds of security review and has had problems found and fixed in each, so it is not yet a proven protection. Switch it on only if you need it, and prefer PNG where you can. An SVG is a picture, but it is also a small program: it can contain scripts, and a script that runs on your Moodle address could act as the person who opened it. So SVG is handled differently from other pictures:
 
 - It is shown on the item page as a picture (an image tag), where browsers never run scripts in it.
 - The file itself is only ever sent as a **download**, with a security header (`Content-Security-Policy: sandbox`, no scripts, no loading of anything) and `nosniff`. Opening its address does not display it as a page.
@@ -262,7 +262,7 @@ Finally delete the plugin folders from the server (Moodle tells you which). Mood
 
 ## 12. What has been tested, and what has not
 
-**Tested** (PHP 8.4, MariaDB), on **Moodle 5.0.11, 5.1.8, 5.2.4 and 5.3**: a fresh install; 117 automated tests of the content type and 7 of backup and restore; Moodle's own privacy and event checks; and 7 browser scenarios (upload, refused files, link, copy, alt text, transcript). All pass on all four versions. The 7 browser scenarios were last run before streaming preparation was added; the automated tests were re-run on all four after it. The plugin zips pass Moodle's own installer validation.
+**Tested** (PHP 8.4, MariaDB), on **Moodle 5.0.11, 5.1.8, 5.2.4 and 5.3**: a fresh install; 118 automated tests of the content type and 7 of backup and restore; Moodle's own privacy and event checks; and 7 browser scenarios (upload, refused files, link, copy, alt text, transcript). All pass on all four versions. The 7 browser scenarios were last run before streaming preparation was added; the automated tests were re-run on all four after it. The plugin zips pass Moodle's own installer validation.
 
 **Not tested:**
 - PHP 8.3 (not available on the test machine). PostgreSQL (only MariaDB was available).

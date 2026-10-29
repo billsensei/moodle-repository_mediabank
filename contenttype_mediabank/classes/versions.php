@@ -115,7 +115,9 @@ class versions {
         if (!isset($versions[$number])) {
             throw new \moodle_exception('errornosuchversion', 'contenttype_mediabank', '', $number);
         }
-        return $content->get_content_type_instance()->replace_content($versions[$number], $content);
+        $restored = $content->get_content_type_instance()->replace_content($versions[$number], $content);
+        event\version_restored::create_from_item($restored, $number)->trigger();
+        return $restored;
     }
 
     /**

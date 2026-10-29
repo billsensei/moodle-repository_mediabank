@@ -81,4 +81,45 @@ class link_helper {
             'filename' => $source->get_filename(),
         ], $repo->id, $reference);
     }
+
+    /**
+     * Link to an item the way a teacher does: pick it into a draft area, then save the form.
+     *
+     * Core tells listeners about the link only when the form is saved, not when the draft link is made.
+     *
+     * @param \core_contentbank\content $item The item to link to.
+     * @param \context $context Where the saved link lives, for example a course module context.
+     * @param string $component Component owning the link.
+     * @param string $filearea File area of the link.
+     * @return \stored_file The saved link.
+     */
+    public static function create_link_by_saving_form(
+        \core_contentbank\content $item,
+        \context $context,
+        string $component = 'mod_resource',
+        string $filearea = 'content'
+    ): \stored_file {
+        global $USER;
+        $source = $item->get_file();
+        $repos = \repository::get_instances(['type' => 'contentbank']);
+        $repo = reset($repos);
+        $draftid = file_get_unused_draft_itemid();
+        get_file_storage()->create_file_from_reference([
+            'contextid' => \context_user::instance($USER->id)->id,
+            'component' => 'user',
+            'filearea' => 'draft',
+            'itemid' => $draftid,
+            'filepath' => '/',
+            'filename' => $source->get_filename(),
+        ], $repo->id, \file_storage::pack_reference([
+            'contextid' => $source->get_contextid(),
+            'component' => $source->get_component(),
+            'filearea' => $source->get_filearea(),
+            'itemid' => $source->get_itemid(),
+            'filepath' => $source->get_filepath(),
+            'filename' => $source->get_filename(),
+        ]));
+        file_save_draft_area_files($draftid, $context->id, $component, $filearea, 0);
+        return get_file_storage()->get_file($context->id, $component, $filearea, 0, '/', $source->get_filename());
+    }
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0 (2026-10-29)
+- Events for what core does not report: `item_linked` (a link to an item is saved in a course or elsewhere; the context is where the link is), `links_converted` (links turned into copies; carries the count; used by the edit form, move and delete) and `version_restored` (carries the version number).
+- `item_linked` uses core's `after_file_created` hook. The link a teacher picks first exists in a draft area and is not reported; the saved link is. Links made by a restore or a course copy are not reported, because core creates those without a hook.
+- Not added: an event for a copy (a copy is an ordinary file), and one for refused uploads.
+- Upload, replace, rename, visibility, alt text, transcript and caption changes, move, view and delete are already reported by core's `contentbank_content_*` events, which fire for media bank items.
+
 ## 0.7.0 (2026-10-29)
 - Web service functions (read only): `contenttype_mediabank_get_items` (list a context, filter by kind and name, paged), `contenttype_mediabank_get_item` (one item with file and caption addresses, alt text, transcript) and `contenttype_mediabank_get_usage` (courses that link to an item; managers only; courses the caller cannot see are counted, not named). They are not added to any service; an admin adds them to an external service. They are not in the Moodle mobile app service.
 - Every function checks access to the media bank in the item's context, which core's search does not. A missing item, an item of another type and an item the caller may not see all give the same error. The creator is not returned.

@@ -165,3 +165,19 @@ downloaded with the teacher token (200, `application/pdf` inline, `text/vtt`), 4
 File serving fix, checked over HTTP with temporary users (`/pluginfile.php/<ctx>/contentbank/public/<id>/<name>`): a public item gives 200 to the
 creator, another teacher and a manager; an unlisted item gives 200 to the creator and a manager and 404 to another teacher. Before the fix another teacher got 200
 for the unlisted item.
+
+## Phase 5: events (2026-10-29)
+After adding events or the hook: bump `version.php`, `php admin/cli/upgrade.php --non-interactive`, `php admin/cli/purge_caches.php` (hook callbacks are cached), `php public/admin/tool/phpunit/cli/init.php`.
+
+    export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
+    vendor/bin/phpunit public/contentbank/contenttype/mediabank/tests/events_test.php   # OK (7 tests, 35 assertions)
+    vendor/bin/phpunit public/lib/tests/event/plugin_checks_test.php                    # OK (414 tests): core checks the structure of every event class
+Whole suite: `OK, but there were issues! Tests: 79, Assertions: 257, PHPUnit Deprecations: 2`.
+Which events fire (measured 2026-10-29, `$this->redirectEvents()`): upload -> `contentbank_content_created` + `_updated`; replace -> `_updated` (twice);
+rename, visibility, alt text, caption change, move -> `_updated`; view -> `_viewed`; delete -> `_deleted`. Ours: `item_linked`, `links_converted`, `version_restored`.
+Why the link event uses a hook: `file_storage::create_file_from_reference()` inserts the file row itself and never calls `create_file()`, so neither
+the file hook nor any event fires when a link is picked. Saving the form copies the draft link with `create_file_from_storedfile()`, which keeps the
+reference and does call `create_file()`; that is the one `item_linked` reports. The test helper `link_helper::create_link_by_saving_form()` does it
+the way a teacher does; `link_helper::create_link()` makes links the way a restore does, so it fires nothing.
+The purge task's counts go to the task log: `php admin/cli/scheduled_task.php --execute='\contenttype_mediabank\task\purge_versions'`
+prints `Deleted N expired media bank version(s).` and `Deleted N orphaned caption file(s).`

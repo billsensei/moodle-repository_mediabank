@@ -112,6 +112,9 @@ class usage {
             $fs->import_external_file($link);
             $count++;
         }
+        if ($count > 0) {
+            event\links_converted::create_from_item($content, $count)->trigger();
+        }
         return $count;
     }
 }

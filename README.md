@@ -19,7 +19,7 @@ Status: **Beta**. Released for testing, so try it on a copy of your site first. 
 | Media bank content type (`contenttype_mediabank`) | `contenttype_mediabank/` | 0.10.0 | Moodle 5.0 to 5.3 |
 | Media bank tools (`local_mediabank`) | `local_mediabank/` | 0.3.0 | the content type |
 
-Install the content type first. Each plugin has its own README and `CHANGES.md`.
+Install the content type first. Each plugin has its own README and `CHANGES.md`; [CHANGELOG.md](CHANGELOG.md) lists the project's releases.
 
 ## What it does
 

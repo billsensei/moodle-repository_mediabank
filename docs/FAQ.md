@@ -158,7 +158,7 @@ There are three read-only web service functions (list items, get one item, and t
 service. See "Web services" in the Administrator guide.
 
 ### How do I upgrade?
-Install the new zip the same way (content type first). Moodle offers to upgrade. Do not uninstall first, because that deletes the
+Install the new zip the same way (content type first). Moodle offers to upgrade. See [UPGRADING.md](UPGRADING.md). Do not uninstall first, because that deletes the
 items. A site that already had the plugin keeps its saved settings.
 
 ### Where do I find the release notes?

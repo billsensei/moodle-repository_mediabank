@@ -207,6 +207,34 @@ final class video_optimizer_test extends \advanced_testcase {
     }
 
     /**
+     * Marking a failure adds one key to what is stored now. Edits made while the file was being worked on are not lost, and a
+     * file that has been replaced meanwhile is not marked.
+     */
+    public function test_marking_a_failure_keeps_edits_made_meanwhile(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $item = link_helper::create_item('m.mp4', mp4_builder::build());
+        $hash = $item->get_file()->get_contenthash();
+        $mark = new \ReflectionMethod(video_optimizer::class, 'mark_failed');
+        // A teacher saves a transcript after the task began and before it gave up.
+        $fresh = new content($DB->get_record('contentbank_content', ['id' => $item->get_id()], '*', MUST_EXIST));
+        $fresh->merge_metadata(['transcript' => 'Written while the task ran.']);
+
+        $mark->invoke(null, $item->get_id(), $hash);
+
+        $stored = $DB->get_record('contentbank_content', ['id' => $item->get_id()], '*', MUST_EXIST);
+        $metadata = (new content($stored))->get_metadata();
+        $this->assertSame('Written while the task ran.', $metadata['transcript']);
+        $this->assertSame($hash, $metadata['streamfailed']);
+
+        // A hash that is no longer the item's file changes nothing.
+        $before = $DB->get_field('contentbank_content', 'configdata', ['id' => $item->get_id()]);
+        $mark->invoke(null, $item->get_id(), sha1('some other file'));
+        $this->assertSame($before, $DB->get_field('contentbank_content', 'configdata', ['id' => $item->get_id()]));
+    }
+
+    /**
      * A bank full of older videos can be queued in one go, once, and only the ones that need it.
      */
     public function test_queue_all_finds_only_videos_that_need_it(): void {

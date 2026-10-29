@@ -79,13 +79,37 @@ class video_optimizer {
      * Remember that the item's current file could not be optimized. This is not an edit of the item, so who last changed it
      * and when are left as they are.
      *
-     * @param content $content The item.
+     * The item is read again here, because it can have been edited while the file was being worked on. Only the one key is
+     * added to what is stored now, and only if the item still has the file that failed.
+     *
+     * @param int $contentid The item.
      * @param string $hash Content hash of the file that failed.
      */
-    protected static function mark_failed(content $content, string $hash): void {
+    protected static function mark_failed(int $contentid, string $hash): void {
         global $DB;
-        $metadata = array_merge($content->get_metadata(), [self::FAILED_KEY => $hash]);
-        $DB->set_field('contentbank_content', 'configdata', json_encode($metadata), ['id' => $content->get_id()]);
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            $record = $DB->get_record('contentbank_content', ['id' => $contentid]);
+            if (!$record) {
+                return;
+            }
+            $content = new content($record);
+            $file = $content->get_file();
+            if (!$file || $file->get_contenthash() !== $hash) {
+                return;
+            }
+            $metadata = json_encode(array_merge($content->get_metadata(), [self::FAILED_KEY => $hash]));
+            // Write only if nobody changed the metadata since it was read here.
+            $unchanged = $record->configdata === null
+                ? 'configdata IS NULL'
+                : $DB->sql_compare_text('configdata', 255) . ' = ' . $DB->sql_compare_text(':old', 255);
+            $DB->execute(
+                "UPDATE {contentbank_content} SET configdata = :new WHERE id = :id AND $unchanged",
+                ['new' => $metadata, 'id' => $contentid] + ($record->configdata === null ? [] : ['old' => $record->configdata])
+            );
+            if ($DB->get_field('contentbank_content', 'configdata', ['id' => $contentid]) === $metadata) {
+                return;
+            }
+        }
     }
 
     /**
@@ -175,7 +199,10 @@ class video_optimizer {
             faststart::rewrite($handle, $size, $path);
         } catch (\RuntimeException $e) {
             mtrace('Media bank item ' . $contentid . ' was left as it is: ' . $e->getMessage());
-            self::mark_failed($content, $hash);
+            // Only a file that cannot be changed is remembered. A full disk or a read error may pass, so it may be tried again.
+            if ($e->getCode() !== faststart::IO_ERROR) {
+                self::mark_failed($contentid, $hash);
+            }
             return self::FAILED;
         } finally {
             fclose($handle);

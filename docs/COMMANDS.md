@@ -270,3 +270,6 @@ Automated security review of the commit found two things, both valid, both fixed
 error; now 32 MB, at most 4,000,000 offsets in total, at most 256 tables, depth at most 5, offsets handled in slices of 65,536 and the corrected box assembled once. (2) a failure could be retried forever; a file that fails is now marked
 with its content hash (`streamfailed` in the item's metadata, written without counting as an edit) and skipped by queue() and queue_all() until it is replaced. Tests added: oversized table (16 MB file, refused with little memory), deep nesting, failed file not retried.
 Results after the fix: contenttype suite 108 tests / 407 assertions OK on 5.3; in-tree phpcs 0 on 5.0, 5.1, 5.2.
+Third automated review finding, valid, fixed: the failure marker rewrote the item's metadata from a copy read when the task started, so an alt text or transcript saved while a large video was being worked on could be lost. `mark_failed()` now re-reads the item,
+checks it still has the file that failed, and writes only if the stored metadata is unchanged since that read (compare-and-set, three tries); I/O errors (`faststart::IO_ERROR`) are not remembered, only files that cannot be changed.
+Results: contenttype suite 109 tests / 410 assertions, local 7 / 27, OK on 5.0, 5.1, 5.2 and 5.3; in-tree phpcs 0 on 5.0, 5.1, 5.2.

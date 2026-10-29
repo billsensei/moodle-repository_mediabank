@@ -47,6 +47,9 @@ class faststart {
     /** @var int Offsets handled at a time, so no big array is made. */
     protected const SLICE = 65536;
 
+    /** @var int Exception code for trouble reading or writing, as opposed to a file that cannot be changed. */
+    public const IO_ERROR = 1;
+
     /** @var int Most top-level boxes read before giving up. A real file has a handful. */
     protected const MAX_TOP_BOXES = 1000;
 
@@ -82,7 +85,7 @@ class faststart {
         }
         $out = fopen($destination, 'wb');
         if (!$out) {
-            throw new \RuntimeException('Cannot write the optimized file.');
+            throw new \RuntimeException('Cannot write the optimized file.', self::IO_ERROR);
         }
         try {
             $moov = self::read($handle, $plan['moovstart'], $plan['moovsize']);
@@ -325,13 +328,13 @@ class faststart {
      */
     protected static function read($handle, int $offset, int $length): string {
         if (fseek($handle, $offset) !== 0) {
-            throw new \RuntimeException('Cannot seek in the file.');
+            throw new \RuntimeException('Cannot seek in the file.', self::IO_ERROR);
         }
         $data = '';
         while (strlen($data) < $length) {
             $part = fread($handle, $length - strlen($data));
             if ($part === false || $part === '') {
-                throw new \RuntimeException('The file ended early.');
+                throw new \RuntimeException('The file ended early.', self::IO_ERROR);
             }
             $data .= $part;
         }
@@ -350,7 +353,7 @@ class faststart {
         for ($written = 0; $written < $length;) {
             $count = fwrite($out, substr($data, $written, self::CHUNK));
             if ($count === false || $count === 0) {
-                throw new \RuntimeException('Cannot write the optimized file.');
+                throw new \RuntimeException('Cannot write the optimized file.', self::IO_ERROR);
             }
             $written += $count;
         }

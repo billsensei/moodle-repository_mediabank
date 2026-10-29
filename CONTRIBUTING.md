@@ -12,7 +12,7 @@ Both are **Beta**, for Moodle 5.0 to 5.3. By contributing you agree that your wo
 
 ## Reporting a problem
 
-Open a [GitHub issue](https://github.com/billsensei/moodle-repository_mediabank/issues) and include:
+Open a [GitHub issue](https://github.com/billsensei/moodle-repository_mediabank/issues/new/choose). The bug report form asks for the following:
 
 - the Moodle version (shown at the bottom of **Site administration → Notifications**), the PHP version and the database
 - the plugin versions (**Site administration → Plugins → Plugins overview**)

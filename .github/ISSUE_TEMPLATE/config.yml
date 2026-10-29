@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability (private)
+    url: https://github.com/billsensei/moodle-repository_mediabank/security/advisories/new
+    about: Do not open a public issue for a security problem. Use GitHub's private report.
+  - name: Problem in Moodle itself
+    url: https://moodle.org/security/
+    about: Security problems in Moodle core go to Moodle, not to this project.

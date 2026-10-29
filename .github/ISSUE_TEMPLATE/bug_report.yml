@@ -1,0 +1,72 @@
+name: Bug report
+description: Something does not work as it should
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting this. **Do not use this form for a security problem.** Report those privately through
+        [SECURITY.md](https://github.com/billsensei/moodle-repository_mediabank/blob/main/SECURITY.md).
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Which plugin?
+      options:
+        - contenttype_mediabank (the content type)
+        - local_mediabank (backup, restore and command-line tools)
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: plugin-versions
+    attributes:
+      label: Plugin versions
+      description: Site administration, Plugins, Plugins overview. For example "contenttype 0.10.0, local 0.3.0".
+    validations:
+      required: true
+  - type: input
+    id: moodle
+    attributes:
+      label: Moodle version
+      description: Shown at the bottom of Site administration, Notifications. For example "5.2.4+".
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: PHP version and database
+      description: For example "PHP 8.4, MariaDB 11".
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw instead. Include the exact message Moodle showed.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps that start from a normal Moodle page. Say which kind of file you used (for example "a 300 MB mp4 from a phone").
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or output
+      description: Error text, task output (for example from `php admin/cli/adhoc_task.php --execute`) or browser console messages. Remove anything private first.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you send
+      options:
+        - label: I looked through the existing issues for the same problem.
+          required: true
+        - label: This is not a security problem.
+          required: true

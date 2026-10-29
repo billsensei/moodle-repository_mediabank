@@ -1,0 +1,46 @@
+name: Feature request
+description: Suggest a new feature or a change in behaviour
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome. For a larger change, agreeing the idea here first saves you from writing code that cannot be merged.
+        See [CONTRIBUTING.md](https://github.com/billsensei/moodle-repository_mediabank/blob/main/CONTRIBUTING.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Who needs it, and what do they do today instead?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to happen?
+      description: Describe it as a teacher or administrator would see it.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Other ways to solve it
+      description: Anything you considered and why you did not choose it.
+  - type: dropdown
+    id: plugin
+    attributes:
+      label: Which plugin would it belong in?
+      options:
+        - contenttype_mediabank (the content type)
+        - local_mediabank (backup, restore and command-line tools)
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: help
+    attributes:
+      label: Would you like to build it?
+      options:
+        - "No, I am only suggesting it"
+        - "Yes, I would send a pull request"
+        - "Maybe, with some guidance"

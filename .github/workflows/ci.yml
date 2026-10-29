@@ -1,4 +1,5 @@
-# UNTESTED: written in Phase 1, not yet run on GitHub. PHP versions to be confirmed per branch.
+# Runs on every push and pull request: 2 plugins x PHP 8.3 and 8.4 x Moodle 5.0 to 5.3 x PostgreSQL and MariaDB = 32 jobs.
+# See docs/DEVELOPMENT.md, section 8.
 name: Moodle Plugin CI
 
 on: [push, pull_request]
@@ -67,7 +68,7 @@ jobs:
 
       - name: Install moodle-plugin-ci
         run: |
-          # local_mediabank depends on contenttype_mediabank. Directory layout for --extra-plugins is unverified.
+          # local_mediabank depends on contenttype_mediabank, so it is installed as an extra plugin.
           mkdir -p extra && cp -r ./repo/contenttype_mediabank extra/
           moodle-plugin-ci install --plugin ./repo/${{ matrix.plugin }} --db-host=127.0.0.1 \
             ${{ matrix.plugin == 'local_mediabank' && '--extra-plugins=./extra' || '' }}

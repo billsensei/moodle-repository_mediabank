@@ -54,6 +54,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 - [Teacher guide](docs/TEACHER-GUIDE.md): upload, link or copy, replace, accessibility, with screenshots
 - [FAQ](docs/FAQ.md): short answers to the questions people ask most
 - [Architecture](docs/ARCHITECTURE.md): how the plugins are built and why, for developers
+- [Development guide](docs/DEVELOPMENT.md): set up, test, check style, build and release
 
 ## Tested
 

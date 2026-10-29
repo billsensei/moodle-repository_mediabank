@@ -42,7 +42,8 @@ A symbolic link from there to this repository works for running tests. Run `php 
 `version.php`, and `php public/admin/tool/phpunit/cli/init.php` (and the Behat `init.php`) again, because the test sites are
 tied to the plugin versions.
 
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains how the plugins are built and why. [docs/COMMANDS.md](docs/COMMANDS.md) is a
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains how the plugins are built and why, and
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) has the commands and procedures in full. [docs/COMMANDS.md](docs/COMMANDS.md) is a
 running record of the exact commands used to test, build and release, with their results. It is the best place to look for how
 something was run.
 

@@ -89,7 +89,7 @@ on all four.
 ## Pull requests
 
 - Branch from `main` and keep your branch up to date with it.
-- Describe what changed and why, and say which Moodle versions you tested on.
+- Describe what changed and why, and say which Moodle versions you tested on. The pull request template asks for this and repeats the checklist above.
 - Pushing to the repository starts the GitHub Actions workflow (`.github/workflows/ci.yml`). It runs both plugins on PHP 8.3 and
   8.4, Moodle 5.0 to 5.3, and PostgreSQL and MariaDB: code style, PHPDoc, validation, PHPUnit and Behat. A pull request needs
   all of it green.

@@ -110,6 +110,20 @@ final class editor_test extends \advanced_testcase {
     }
 
     /**
+     * A transcript has a length limit, so one item cannot hold an enormous text.
+     */
+    public function test_transcript_length_is_limited(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $item = link_helper::create_item('clip.mp4', media_samples::get('mp4'));
+        $form = $this->form($item);
+
+        $limit = \contenttype_mediabank\content::MAX_TRANSCRIPT_LENGTH;
+        $this->assertArrayNotHasKey('transcript', $form->validation(['transcript' => str_repeat('a', $limit)], []));
+        $this->assertArrayHasKey('transcript', $form->validation(['transcript' => str_repeat('a', $limit + 1)], []));
+    }
+
+    /**
      * An image needs a text alternative, and the form refuses to save without it.
      */
     public function test_image_requires_alt_text(): void {

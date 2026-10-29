@@ -163,6 +163,9 @@ class editor extends \core_contentbank\form\edit_content {
         if ($this->kind === 'image' && trim((string) ($data['alt'] ?? '')) === '') {
             $errors['alt'] = get_string('required');
         }
+        if (\core_text::strlen((string) ($data['transcript'] ?? '')) > content::MAX_TRANSCRIPT_LENGTH) {
+            $errors['transcript'] = get_string('errortranscripttoolong', 'contenttype_mediabank', content::MAX_TRANSCRIPT_LENGTH);
+        }
         if (!empty($data['captions'])) {
             $caption = $this->get_draft_caption((int) $data['captions']);
             if ($caption && !captions::is_valid($caption)) {

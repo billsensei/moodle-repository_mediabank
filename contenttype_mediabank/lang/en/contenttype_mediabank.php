@@ -49,6 +49,7 @@ $string['errornosuchversion'] = 'Version {$a} of this item does not exist.';
 $string['errornotallowed'] = 'The file {$a->name} was not accepted because this kind of file is not allowed in the media bank.';
 $string['errorsvgactive'] = 'The file {$a->name} was not accepted because an SVG file may contain only a picture: no scripts, animation, embedded pages, event handlers or links that load anything.';
 $string['errortoolarge'] = 'The file {$a->name} was not accepted because it is larger than the limit of {$a->max}.';
+$string['errortranscripttoolong'] = 'The transcript is too long. It may have at most {$a} characters.';
 $string['eventitemlinked'] = 'Media bank item linked';
 $string['eventlinksconverted'] = 'Media bank links converted to copies';
 $string['eventversionrestored'] = 'Media bank version restored';

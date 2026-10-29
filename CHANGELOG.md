@@ -8,7 +8,16 @@ and the bundle zip attached.
 
 ## Unreleased
 
-`contenttype_mediabank` 0.11.0 (2026102910), not yet released:
+Hardening found by a security review of both plugins (no release yet):
+
+- `contenttype_mediabank`: a transcript may have at most 100,000 characters. The edit form refuses a longer one.
+- `local_mediabank`: restoring a backup whose embedded-file entry has no link id skips the entry quietly.
+- Administrator guide: web service results hold text typed by teachers, so a program that shows them must escape them; and a
+  backup with linked files holds the item's current file, even if the owner has since made the item unlisted.
+
+## [0.11.0] - 2026-10-29
+
+`contenttype_mediabank` 0.11.0 (2026102910), `local_mediabank` 0.3.0 (2026102904).
 
 - **SVG images** can be allowed with a setting that is **off by default**. When on, an SVG is shown as a picture and sent only as a
   sandboxed download, and it is read as XML and refused unless every element and attribute is on a list of what is allowed (no
@@ -71,5 +80,6 @@ Repository and documentation only, no change to the plugins:
 - Both plugins are Beta. Language strings are in alphabetical order and the privacy test is in `tests/privacy/`, as Moodle's
   current coding standard requires (found by the first GitHub Actions run).
 
+[0.11.0]: https://github.com/billsensei/moodle-repository_mediabank/releases/tag/v0.11.0
 [0.10.0]: https://github.com/billsensei/moodle-repository_mediabank/releases/tag/v0.10.0
 [0.9.2]: https://github.com/billsensei/moodle-repository_mediabank/releases/tag/v0.9.2

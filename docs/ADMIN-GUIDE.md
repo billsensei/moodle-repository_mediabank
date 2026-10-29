@@ -155,6 +155,7 @@ To avoid the last case, switch on **Include linked files in course backups** (se
 - Manual course backups also contain the files behind each link, in the course's own files and in its activities.
 - On restore, a link that can still be a link stays a link. Any other becomes an **ordinary copy** with the right content, including links nobody had opened.
 - **Import, course copy and automated backups are not changed.**
+- **The backup holds the item's current file**, even if its owner has since made the item unlisted. The course already shows that file through the link, so nothing new is shown, but anyone who can download backups of the course gets it.
 - **Backups get bigger.** A course that links three 500 MB videos adds about 1.5 GB.
 - The setting is **site-wide**. Moodle gives plugins no way to add a tick box to the backup screen, so it cannot be chosen per backup.
 
@@ -192,7 +193,7 @@ Call, for example:
 
     GET <site>/webservice/rest/server.php?wstoken=TOKEN&wsfunction=contenttype_mediabank_get_items&moodlewsrestformat=json&contextid=NN
 
-The `fileurl` and `captionsurl` in the result are addresses on `webservice/pluginfile.php`. Add `?token=TOKEN` to download. A user must have the Media bank permissions in that context; anyone else gets *"There is no such media bank item that you can use."*, which is also what a missing item gives. To upload, rename, copy, hide or delete, use Moodle's own `core_contentbank_*` functions: deleting a linked item is refused there too.
+The `fileurl` and `captionsurl` in the result are addresses on `webservice/pluginfile.php`. Add `?token=TOKEN` to download. A user must have the Media bank permissions in that context; anyone else gets *"There is no such media bank item that you can use."*, which is also what a missing item gives. The item name, text alternative and transcript are returned as plain text that the teacher typed, not as safe HTML: **a program that shows them on a web page must escape them**. To upload, rename, copy, hide or delete, use Moodle's own `core_contentbank_*` functions: deleting a linked item is refused there too.
 
 ## 9. Logs and events
 

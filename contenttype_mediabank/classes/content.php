@@ -24,6 +24,9 @@ namespace contenttype_mediabank;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class content extends \core_contentbank\content {
+    /** @var int Most characters a transcript may have. */
+    public const MAX_TRANSCRIPT_LENGTH = 100000;
+
     /**
      * Facts kept with the item: kind, image size, and later alt text, transcript and so on.
      *

@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- A transcript may have at most 100,000 characters (`content::MAX_TRANSCRIPT_LENGTH`). The edit form refuses a longer one. Before, there was no limit. Found by a security review (hardening).
+
 ## 0.11.0 (2026-10-29)
 - SVG images can be allowed with the setting "Allow SVG images", which stays **off by default**. Turn it on only if you want them; see the Admin guide, "SVG files".
 - An SVG is shown on the item page as a picture. The file is sent only as a download, with `Content-Security-Policy: sandbox; default-src 'none'` and `nosniff`, so opening its address never runs it as a page.

@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Restoring a backup whose embedded-file entry has no link id no longer raises a warning. The entry is skipped, as an entry with a bad content hash already was. Found by a security review (hardening).
+
 ## 0.3.0 (2026-10-29)
 - New command `php local/mediabank/cli/optimize_videos.php [--dry-run]`: queue the MP4 videos already in the media bank that are not ready for streaming. Needs contenttype_mediabank 0.10.0.
 

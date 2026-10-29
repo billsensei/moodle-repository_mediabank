@@ -154,10 +154,11 @@ class embedded_links {
     public static function remember(string $restoreid, array $data): void {
         // The backup file is not trusted: keep only values of the expected shape.
         $hash = (string) ($data['contenthash'] ?? '');
-        if (!preg_match('/^[0-9a-f]{40}$/', $hash)) {
+        $aliasid = (int) ($data['aliasid'] ?? 0);
+        if (!preg_match('/^[0-9a-f]{40}$/', $hash) || $aliasid <= 0) {
             return;
         }
-        \restore_dbops::set_backup_ids_record($restoreid, self::ITEMNAME, (int) $data['aliasid'], 0, null, (object) [
+        \restore_dbops::set_backup_ids_record($restoreid, self::ITEMNAME, $aliasid, 0, null, (object) [
             'contenthash' => $hash,
             'filename' => clean_param((string) ($data['filename'] ?? ''), PARAM_FILE),
         ]);

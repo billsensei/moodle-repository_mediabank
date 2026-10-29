@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.0 (2026-10-29)
+- SVG images are accepted by default for new installs (the setting "Allow SVG images" is now on by default). A site that already had the plugin keeps the choice it saved, which was off.
+- An SVG is shown on the item page as a picture. The file is sent only as a download, with `Content-Security-Policy: sandbox; default-src 'none'` and `nosniff`, so opening its address never runs it as a page.
+- An SVG with scripts, embedded pages, event attributes, `javascript:` or `data:text/html` links, or `<!ENTITY>` is refused on upload and replace, with its own message. This is a second layer on top of the way the file is shown and sent. It is also checked across the boundary of the 1 MB reads, so a large file cannot hide a tag at the join.
+- The image kind in the settings is now listed as png, jpg, gif, webp and svg.
+
 ## 0.10.0 (2026-10-29)
 - New: MP4 videos are prepared for streaming. When an MP4 is uploaded or replaced, an ad hoc task moves the file's index (the `moov` box) in front of the picture and sound data, so a browser can start playing before the whole file has downloaded. Nothing is re-encoded: picture and sound are untouched and the file keeps its size. No program such as ffmpeg is needed on the server.
 - The file as uploaded is kept as an earlier version for the retention time (not kept if the retention is 0). Links from courses follow the new file. The item's last editor is not changed.

@@ -8,6 +8,11 @@ and the bundle zip attached.
 
 ## Unreleased
 
+`contenttype_mediabank` 0.11.0 (2026102910), not yet released:
+
+- **SVG images** are accepted by default for new installs, shown as pictures, and sent only as sandboxed downloads. An SVG with scripts
+  or other active content is refused. Sites that already had the plugin keep their saved setting (off).
+
 Repository and documentation only, no change to the plugins:
 
 - Added `README.md` (it was only a title), `LICENSE` (GNU GPL v3), `composer.json`, `CONTRIBUTING.md`, `SECURITY.md`,

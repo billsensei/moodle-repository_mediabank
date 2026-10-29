@@ -21,7 +21,7 @@ The file now appears in the list. Click its name to open its page, where you can
 
 **Will my video start quickly?** If your site has it switched on (it is by default), an MP4 video is prepared for streaming a few minutes after you upload it, so students can start watching before the whole file has downloaded. Nothing about the picture or sound changes. It is done by the server in the background; there is nothing for you to do. The file you uploaded is kept as an earlier version (see section 5).
 
-**Which files are allowed?** Videos (mp4, webm), audio (mp3, m4a, ogg), PDFs and images (png, jpg, gif, webp). Your site administrator sets the size limits. By default they are 1 GB for video, 200 MB for audio, 100 MB for PDFs and 20 MB for images.
+**Which files are allowed?** Videos (mp4, webm), audio (mp3, m4a, ogg), PDFs and images (png, jpg, gif, webp and, if your site allows it, svg). Your site administrator sets the size limits. By default they are 1 GB for video, 200 MB for audio, 100 MB for PDFs and 20 MB for images.
 
 **Why was my file refused?** The Media bank checks what is *inside* a file, not only its name. You will see a message such as:
 
@@ -30,6 +30,7 @@ The file now appears in the list. Click its name to open its page, where you can
 | "…content is not the kind of file its name says" | The file is not really what its name says, for example a document renamed to `.png`. | Export it again in the right format. |
 | "…this kind of file is not allowed" | Your site does not accept this kind of file. | Ask your administrator. |
 | "…larger than the limit of …" | The file is too big. | Compress it, or ask your administrator. |
+| "…an SVG file must not contain scripts or other active content" | The SVG has a script or something like it in it. | Export it again as a plain SVG, or as a PNG. |
 | "…is empty" | The file has nothing in it. | Check the original and upload again. |
 
 A very large file can also fail because of a limit on the server, and then there may be no clear message. If that happens, ask your administrator to check the upload limits.

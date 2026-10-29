@@ -203,22 +203,94 @@ final class upload_rules_test extends \advanced_testcase {
     }
 
     /**
-     * SVG is off by default, and when switched on it is stored but never served inline.
+     * SVG is accepted by default and is never served inline. An admin can switch it off.
      */
-    public function test_svg_off_by_default(): void {
+    public function test_svg_accepted_by_default_and_never_inline(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
-        try {
-            $this->upload('x.svg', media_samples::get('svg'));
-            $this->fail('SVG was accepted by default.');
-        } catch (\moodle_exception $e) {
-            $this->assertSame('errornotallowed', $e->errorcode);
-        }
-
-        set_config('allowsvg', 1, 'contenttype_mediabank');
+        // A site that has never saved the setting, as a new install is before anyone opens the page.
+        unset_config('allowsvg', 'contenttype_mediabank');
+        upload_rules::purge_caches();
+        $this->assertTrue(upload_rules::is_svg_allowed());
         $content = $this->upload('x.svg', media_samples::get('svg'));
+        $this->assertSame('image', $content->get_metadata()['kind']);
         $method = new \ReflectionMethod(contenttype::class, 'is_safe_to_serve_inline');
         $this->assertFalse($method->invoke(null, $content->get_file(), 'svg'));
+
+        set_config('allowsvg', 0, 'contenttype_mediabank');
+        $this->assertFalse(upload_rules::is_svg_allowed());
+        $this->assert_refused('errornotallowed', fn() => $this->upload('y.svg', media_samples::get('svg')));
+    }
+
+    /**
+     * Real-world SVG files, with an XML header, comments, a doctype or a byte order mark, are accepted.
+     */
+    public function test_clean_svg_files_are_accepted(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        set_config('allowsvg', 1, 'contenttype_mediabank');
+        upload_rules::purge_caches();
+        $ns = 'xmlns="http://www.w3.org/2000/svg"';
+        $files = [
+            'plain' => "<svg $ns width=\"1\" height=\"1\"/>",
+            'xml header and comment' => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- Created with Inkscape -->\n"
+                . "<svg $ns><g/></svg>",
+            'doctype' => "<?xml version=\"1.0\"?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" "
+                . "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<svg $ns/>",
+            'byte order mark' => "\xEF\xBB\xBF<svg $ns/>",
+            'style element' => "<svg $ns><style>.a{fill:red}</style><rect class=\"a\" width=\"1\" height=\"1\"/></svg>",
+            'words that look like handlers' => "<svg $ns><text>Turn on and off, once more</text></svg>",
+        ];
+        foreach ($files as $label => $svg) {
+            $this->assertSame('image', $this->upload('ok.svg', $svg)->get_metadata()['kind'], $label);
+        }
+    }
+
+    /**
+     * An SVG with scripts or other active content is refused, whatever it looks like otherwise.
+     */
+    public function test_svg_with_active_content_is_refused(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        set_config('allowsvg', 1, 'contenttype_mediabank');
+        upload_rules::purge_caches();
+        $bodies = [
+            'script element' => '<script>alert(1)</script>',
+            'script, odd case and spacing' => '< ScRiPt >alert(1)</ScRiPt>',
+            'self closing script' => '<script href="x.js"/>',
+            'event attribute' => '<rect width="1" height="1" onload="alert(1)"/>',
+            'event attribute with spaces' => '<rect onclick = "alert(1)"/>',
+            'javascript link' => '<a href="javascript:alert(1)"><rect/></a>',
+            'embedded page' => '<foreignObject><iframe src="x"/></foreignObject>',
+            'embed' => '<embed src="x"/>',
+            'entity definition' => '<!ENTITY a "b">',
+            'html data link' => '<image href="data:text/html;base64,PHNjcmlwdD4="/>',
+        ];
+        foreach ($bodies as $label => $body) {
+            $svg = '<svg xmlns="http://www.w3.org/2000/svg">' . $body . '</svg>';
+            try {
+                $this->upload('bad.svg', $svg);
+                $this->fail("The SVG with a $label was accepted.");
+            } catch (\moodle_exception $e) {
+                $this->assertSame('errorsvgactive', $e->errorcode, $label);
+            }
+        }
+    }
+
+    /**
+     * Active content is found even where it falls across the boundary of two reads of a large file.
+     */
+    public function test_active_content_is_found_across_a_read_boundary(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        set_config('allowsvg', 1, 'contenttype_mediabank');
+        upload_rules::purge_caches();
+        $chunk = 1048576;
+        // Put the tag so that it starts four bytes before the end of the first read.
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg">';
+        $svg .= str_repeat(' ', $chunk - strlen($svg) - 4) . '<script>alert(1)</script></svg>';
+        $this->assertSame(strpos($svg, '<script'), $chunk - 4);
+        $this->assert_refused('errorsvgactive', fn() => $this->upload('big.svg', $svg));
     }
 
     /**

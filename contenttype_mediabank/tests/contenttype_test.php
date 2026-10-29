@@ -27,16 +27,18 @@ namespace contenttype_mediabank;
  */
 final class contenttype_test extends \advanced_testcase {
     /**
-     * The content type manages all four media kinds, and SVG is never served inline.
+     * The content type manages all four media kinds, SVG included, and SVG is never served inline.
      */
     public function test_manageable_extensions(): void {
         $this->resetAfterTest();
+        unset_config('allowsvg', 'contenttype_mediabank');
+        upload_rules::purge_caches();
         $type = new contenttype(\context_system::instance());
         $extensions = $type->get_manageable_extensions();
         foreach (['.mp4', '.mp3', '.pdf', '.png'] as $expected) {
             $this->assertContains($expected, $extensions);
         }
-        $this->assertNotContains('.svg', $extensions);
+        $this->assertContains('.svg', $extensions);
         $this->assertArrayNotHasKey('svg', contenttype::INLINE_MIMETYPES);
     }
 
@@ -96,10 +98,17 @@ final class contenttype_test extends \advanced_testcase {
         ], '<html><script>alert(1)</script></html>');
         $this->assertFalse($method->invoke(null, $html, 'png'));
 
-        set_config('allowsvg', 1, 'contenttype_mediabank');
+        unset_config('allowsvg', 'contenttype_mediabank');
         upload_rules::purge_caches();
-        $svg = $this->upload_item('x.svg', '<svg xmlns="http://www.w3.org/2000/svg"><script/></svg>')->get_file();
-        $this->assertFalse($method->invoke(null, $svg, 'svg'));
+        $svg = $this->upload_item('x.svg', '<svg xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1"/></svg>');
+        $this->assertFalse($method->invoke(null, $svg->get_file(), 'svg'));
+
+        // The item page shows it as a picture, and the file is sent only as a download that cannot run as a page.
+        $page = $svg->get_content_type_instance()->get_view_content($svg);
+        $this->assertStringContainsString('<img', $page);
+        $headers = implode("\n", contenttype::SVG_HEADERS);
+        $this->assertStringContainsString('nosniff', $headers);
+        $this->assertStringContainsString("Content-Security-Policy: sandbox; default-src 'none'", $headers);
     }
 
     /**

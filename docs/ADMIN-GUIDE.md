@@ -40,8 +40,8 @@ Behind it:
 
 | Setting | Default | What it does |
 |---|---|---|
-| **Allowed file kinds** | All four | Which kinds can be uploaded: Video (mp4, webm), Audio (mp3, m4a, ogg), PDF documents, Images (png, jpg, gif, webp). Items already uploaded stay available if you untick a kind. |
-| **Allow SVG images** | Off | SVG files can contain scripts. If you allow them they are stored, but always downloaded and never shown in the page. |
+| **Allowed file kinds** | All four | Which kinds can be uploaded: Video (mp4, webm), Audio (mp3, m4a, ogg), PDF documents, Images (png, jpg, gif, webp; and svg, see below). Items already uploaded stay available if you untick a kind. |
+| **Allow SVG images** | On for new installs | See "SVG files" below. A site that already had the plugin keeps its saved choice (which was off), so tick it there if you want SVG. |
 | **Maximum video size** | 1 GB | Largest video accepted. |
 | **Maximum audio size** | 200 MB | |
 | **Maximum PDF size** | 100 MB | |
@@ -63,6 +63,13 @@ Behind it:
       php local/mediabank/cli/optimize_videos.php --dry-run    # only count them
       php local/mediabank/cli/optimize_videos.php
 
+**SVG files.** An SVG is a picture, but it is also a small program: it can contain scripts, and a script that runs on your Moodle address could act as the person who opened it. So SVG is handled differently from other pictures:
+
+- It is shown on the item page as a picture (an image tag), where browsers never run scripts in it.
+- The file itself is only ever sent as a **download**, with a security header (`Content-Security-Policy: sandbox`, no scripts, no loading of anything) and `nosniff`. Opening its address does not display it as a page.
+- An SVG that contains a script, an embedded page (`foreignObject`, `iframe`, `embed`, `object`), an event attribute such as `onload=`, a `javascript:` link, a `data:text/html` link or an `<!ENTITY>` is **refused** on upload and replace, with the message "…an SVG file must not contain scripts or other active content." This is a second layer, not the protection: a determined person can write the same thing in a way the check does not match.
+- **A copy or link in a course is served by Moodle itself, like any file a teacher puts in a course**, and Moodle shows an SVG as a page when its address is opened. Teachers can already put an HTML page with scripts in a course, so this adds little, but if you do not want SVG files in courses at all, untick the setting. Items already uploaded stay, and are still shown.
+
 **Disk space and versions.** Every kept version takes its full size on disk until it expires. Replacing a 500 MB video holds 500 MB for 30 days. Lower the number of days, or set 0, if disk space is tight.
 
 **What the upload checks do.** Moodle works out a file's type from its *name*, which anyone can fake. The Media bank also reads the start of the file and refuses it if the contents do not match the name. A renamed file is refused with: *"The file … was not accepted because its content is not the kind of file its name says."* Other messages:
@@ -70,6 +77,7 @@ Behind it:
 | Message | Meaning |
 |---|---|
 | "…was not accepted because it is empty." | Zero bytes. |
+| "…an SVG file must not contain scripts or other active content." | The SVG has something on the list above in it. |
 | "…was not accepted because this kind of file is not allowed in the media bank." | The kind is switched off, or the extension is not supported. |
 | "…was not accepted because it is larger than the limit of …" | Over the maximum for that kind. |
 | "…cannot replace this item. A replacement must be a .xxx file, so that existing links keep working." | A replacement must keep the same file extension. |
@@ -252,7 +260,7 @@ Finally delete the plugin folders from the server (Moodle tells you which). Mood
 
 ## 12. What has been tested, and what has not
 
-**Tested** (PHP 8.4, MariaDB), on **Moodle 5.0.11, 5.1.8, 5.2.4 and 5.3**: a fresh install; 109 automated tests of the content type and 7 of backup and restore; Moodle's own privacy and event checks; and 7 browser scenarios (upload, refused files, link, copy, alt text, transcript). All pass on all four versions. The 7 browser scenarios were last run before streaming preparation was added; the automated tests were re-run on all four after it. The plugin zips pass Moodle's own installer validation.
+**Tested** (PHP 8.4, MariaDB), on **Moodle 5.0.11, 5.1.8, 5.2.4 and 5.3**: a fresh install; 112 automated tests of the content type and 7 of backup and restore; Moodle's own privacy and event checks; and 7 browser scenarios (upload, refused files, link, copy, alt text, transcript). All pass on all four versions. The 7 browser scenarios were last run before streaming preparation was added; the automated tests were re-run on all four after it. The plugin zips pass Moodle's own installer validation.
 
 **Not tested:**
 - PHP 8.3 (not available on the test machine). PostgreSQL (only MariaDB was available).

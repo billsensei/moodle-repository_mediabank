@@ -39,11 +39,18 @@ class contenttype extends \core_contentbank\contenttype {
         'webp' => 'image/webp',
     ];
 
+    /** @var string[] Headers sent with an SVG file. It is a download, never a page, and nothing in it may run or load. */
+    public const SVG_HEADERS = [
+        'X-Content-Type-Options: nosniff',
+        "Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'; img-src data:",
+    ];
+
     /**
      * Serve a media bank file.
      *
      * Core forces a download when this returns false. Files whose extension is on the allow-list are
-     * sent inline so they can play or display. Anything else, including SVG, stays download-only.
+     * sent inline so they can play or display. Anything else stays download-only. An SVG is sent as a download with
+     * SVG_HEADERS, which a picture on a page can still show but which never runs as a page.
      *
      * @param \stdClass|null $course Course record.
      * @param \cm_info|null $cm Course module (always null for the content bank).
@@ -74,6 +81,13 @@ class contenttype extends \core_contentbank\contenttype {
         }
 
         $extension = strtolower(pathinfo($file->get_filename(), PATHINFO_EXTENSION));
+        if ($extension === 'svg' && upload_rules::content_matches_extension($file, 'svg')) {
+            foreach (self::SVG_HEADERS as $header) {
+                header($header);
+            }
+            send_stored_file($file, 0, 0, true, $options);
+            return true;
+        }
         if (!self::is_safe_to_serve_inline($file, $extension)) {
             return false;
         }
@@ -175,7 +189,8 @@ class contenttype extends \core_contentbank\contenttype {
             return $html;
         }
         $extension = strtolower(pathinfo($file->get_filename(), PATHINFO_EXTENSION));
-        $mime = self::INLINE_MIMETYPES[$extension] ?? '';
+        // An SVG is shown as a picture. The file is still only ever sent as a download.
+        $mime = self::INLINE_MIMETYPES[$extension] ?? ($extension === 'svg' ? 'image/svg+xml' : '');
         $captions = captions::get($content);
         $captionsurl = $captions ? \moodle_url::make_pluginfile_url(
             $captions->get_contextid(),

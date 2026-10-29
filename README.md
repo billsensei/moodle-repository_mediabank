@@ -24,7 +24,7 @@ Install the content type first. Each plugin has its own README and `CHANGES.md`;
 ## What it does
 
 - **Upload checks.** A file's content must match its name, so a document renamed to `.png` is refused. Kinds and size limits are
-  settings: video (mp4, webm), audio (mp3, m4a, ogg), PDF, images (png, jpg, gif, webp).
+  settings: video (mp4, webm), audio (mp3, m4a, ogg), PDF, images (png, jpg, gif, webp, svg). An SVG is shown as a picture, only ever sent as a download, and refused if it contains scripts.
 - **Where it is used.** An item's page lists the courses that link to it. An item that courses link to cannot be deleted by accident.
 - **Replace and undo.** Replacing an item updates every link. The old file is kept as a version (30 days by default) and can be put back.
 - **Accessibility fields.** Text alternative (required for images), transcript, and WebVTT captions.

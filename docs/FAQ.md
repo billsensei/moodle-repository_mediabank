@@ -135,6 +135,9 @@ you need it. The Administrator guide's "SVG files" section has the details.
 
 ## Administrators
 
+### Where are the settings? There is no Settings link on one of the Media bank rows.
+The settings are under **Site administration → Plugins → Content bank → Media bank**. On **Plugins overview** there are two **Media bank** rows. The one of type *Content bank* has a **Settings** link to that page. The one of type *Local plugin* (the tools) has no link, because it has no settings of its own and Moodle does not show that link for local plugins. Nothing is wrong.
+
 ### A large upload fails with no clear message.
 Almost always a server limit. PHP's `upload_max_filesize`, `post_max_size` and `max_execution_time`, your web server's body limit,
 Moodle's maximum upload size settings, and, for the Content bank upload form, the **Private files space** limit (or give uploaders

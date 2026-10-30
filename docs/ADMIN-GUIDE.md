@@ -38,6 +38,8 @@ Behind it:
 
 **Site administration → Plugins → Content bank → Media bank**
 
+You can also reach this page from **Site administration → Plugins → Plugins overview**: find the **Media bank** row whose type is *Content bank* and click **Settings**. The other **Media bank** row (type *Local plugin*, the tools) has no Settings link, because it has no settings of its own and Moodle does not give local plugins that link.
+
 | Setting | Default | What it does |
 |---|---|---|
 | **Allowed file kinds** | All four | Which kinds can be uploaded: Video (mp4, webm), Audio (mp3, m4a, ogg), PDF documents, Images (png, jpg, gif, webp; svg only if allowed, see below). Items already uploaded stay available if you untick a kind. |

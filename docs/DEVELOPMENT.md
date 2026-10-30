@@ -188,7 +188,9 @@ whole run has finished (the logs are not available while it runs).
 6. Delete the branch.
 
 Never change a release's tag after publishing. A documentation-only change after a release can be pushed to `main`; the bundle zip on
-the release may be replaced with a rebuilt one (the plugin zips stay as they are).
+the release may be replaced with a rebuilt one (the plugin zips stay as they are). A change to the plugins' code gets a new version
+number and a new release, because an installed copy only upgrades when the number goes up. v0.11.0 is the one exception: its zips were
+replaced on 2026-10-30 with the hardening, without a new number, and the changelog says so. Do not repeat that.
 
 ## 10. Security review habits
 

@@ -36,7 +36,7 @@ Update, on that branch:
 
 - [ ] `version.php` in each plugin that changed (`version` and `release`).
 - [ ] `contenttype_mediabank/CHANGES.md` and `local_mediabank/CHANGES.md`: rename "Unreleased" to the new version and date.
-- [ ] Root `CHANGELOG.md`: a new dated section with both plugin versions, and a `[x.y.z]: https://github.com/billsensei/moodle-repository_mediabank/releases/tag/vx.y.z` link at the bottom.
+- [ ] Root `CHANGELOG.md` (see [CHANGELOG-POLICY.md](CHANGELOG-POLICY.md)): a new dated section with both plugin versions, and a `[x.y.z]: https://github.com/billsensei/moodle-repository_mediabank/releases/tag/vx.y.z` link at the bottom.
 - [ ] [UPGRADING.md](UPGRADING.md): a row in the per-version table if an administrator sees any difference.
 - [ ] [SECURITY.md](../SECURITY.md): the supported-version table (for example `0.11.x`).
 - [ ] [ROADMAP.md](ROADMAP.md): the version numbers at the top, and move finished items out of "might come next".

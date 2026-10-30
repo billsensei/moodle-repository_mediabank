@@ -68,6 +68,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 - [Code of conduct](docs/CODE-OF-CONDUCT.md): the short version, with how to report a problem
 - [Maintainers](docs/MAINTAINERS.md): who looks after it, the standing rules, and the release routine
 - [Releasing](docs/RELEASING.md): the step-by-step checklist for a new version
+- [Changelog policy](docs/CHANGELOG-POLICY.md): what goes in each changelog, and how to write an entry
 
 ## Tested
 

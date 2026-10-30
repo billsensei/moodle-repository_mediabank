@@ -16,6 +16,8 @@ Thank you to everyone who has helped build the Media bank.
 - **Moodle** and the Moodle community, for the Content bank, the file picker and the plugin APIs this project builds on. Moodle is licensed under the GNU GPL v3, like these plugins.
 - **moodle-plugin-ci** and Moodle's coding-standard tools, which the GitHub Actions workflow uses on every push.
 
+For the projects and tools the Media bank is built with, see [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md).
+
 ## Your name here
 
 Contributions of any size count: a bug report, a better sentence in a guide, a test, a translation, a fix. See [CONTRIBUTING.md](../CONTRIBUTING.md) for how to start.

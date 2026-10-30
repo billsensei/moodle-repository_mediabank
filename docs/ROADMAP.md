@@ -26,7 +26,7 @@ Not decided. Each needs a design check against how Moodle works.
 - **Convert just my course's link to a copy.** Today a teacher picks the item again and chooses "Make a copy of the file", and only a manager can convert all links at once.
 - **Carry alt text, transcripts and captions with the file.** Today a course gets the bare file. Moodle gives a plugin no standard way to attach these to a file alias, so this is a hard one.
 - **A clearer "where is this used" page,** with links to the activities and not only the course names.
-- **Translations.** The plugins ship English only. Language packs are welcome.
+- **Translations.** The plugins ship English only. Language packs are welcome: see [TRANSLATING.md](TRANSLATING.md).
 
 ## 3. Ideas for administrators
 

@@ -12,6 +12,8 @@ If you only want to use the plugins, you do not need this page. See the [Adminis
 
 Contact the maintainer through GitHub: an issue for anything public, and a private security report for anything that could harm a site. See [SUPPORT.md](SUPPORT.md) and [SECURITY.md](../SECURITY.md). No personal email address is published here on purpose.
 
+How decisions are made, and how someone becomes a maintainer, is in [GOVERNANCE.md](GOVERNANCE.md).
+
 ## What the maintainer is responsible for
 
 - Answering issues and pull requests on a best-effort basis. There is no promised reply time ([SUPPORT.md](SUPPORT.md)).

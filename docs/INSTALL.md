@@ -13,6 +13,22 @@ It is two plugins, installed in this order:
 
 The second one needs the first, so install them in that order. Do not unzip anything. Moodle reads the zip files as they are.
 
+## Which file do I download?
+
+Get the two zips from the **Releases** page on GitHub (open the latest release and look under **Assets**):
+
+- `contenttype_mediabank_<version>.zip`
+- `local_mediabank_<version>.zip`
+
+Do **not** use these, because Moodle cannot install them:
+
+| Not this | Why |
+|---|---|
+| **Code → Download ZIP**, or **Source code (zip)** (named like `moodle-repository_mediabank-main.zip`) | It is the whole project. The plugins are folders inside it, and Moodle reads only a zip that is one plugin. |
+| `mediabank-<version>-bundle.zip` | It holds the two plugin zips and the guides. Unzip it on your computer first, then upload the two plugin zips from inside it. |
+
+The name `moodle-repository_mediabank` is only the name of the project on GitHub. It is not a plugin and nothing needs to be renamed.
+
 **Before you start:** make a backup of your site (database and `moodledata`). That is good practice for any plugin, and it is the only way to go back to an earlier version of this one (see "Removing the plugin" in the Admin guide).
 
 ## What you need

@@ -12,6 +12,7 @@ Commands below are run from the Moodle folder on the server.
 
 | What you see | Cause and fix |
 |---|---|
+| Moodle says it is **not a valid plugin package**, or asks you to pick a **Plugin type** that you cannot choose | You uploaded the wrong file: the GitHub "Download ZIP" or "Source code" file, or the `-bundle.zip`. Neither is a plugin. From the release's **Assets**, upload `contenttype_mediabank_<version>.zip` first and `local_mediabank_<version>.zip` second. See "Which file do I download?" in [INSTALL.md](INSTALL.md). |
 | "The ZIP package must contain just one directory" | The zip was unpacked and packed again. Use the original zip from the release. |
 | "Plugin name mismatch" or "Plugin type mismatch" | The zip was re-made by another tool. Use the original zip. |
 | A missing **dependency** when installing the tools plugin | Install `contenttype_mediabank` first, then `local_mediabank`. |

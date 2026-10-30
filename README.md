@@ -73,6 +73,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 - [Changelog policy](docs/CHANGELOG-POLICY.md): what goes in each changelog, and how to write an entry
 - [Style guide](docs/STYLE-GUIDE.md): how the guides and the words on the screen are written
 - [Plugin directory](docs/PLUGIN-DIRECTORY.md): the listing text and checklist for submitting to the Moodle Plugins directory
+- [Funding](docs/FUNDING.md): it is free; how to help, and what would happen if sponsorship is ever added
 - [Acknowledgements](docs/ACKNOWLEDGEMENTS.md): the projects and tools this stands on
 
 ## Tested

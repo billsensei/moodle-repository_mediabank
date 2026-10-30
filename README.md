@@ -51,6 +51,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 
 ## Guides
 
+- [Getting started](docs/GETTING-STARTED.md): install it, upload a file and use it in a course, in about fifteen minutes
 - [Install walk-through (PDF)](docs/Install-Walk-Thru.pdf): installing from the Moodle screen, step by step with screenshots, no commands
 - [Use walk-through (PDF)](docs/Use-Walk-Thru.pdf): for teachers, step by step with screenshots
 - [Install guide](docs/INSTALL.md)

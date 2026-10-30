@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+The change below is already in the 0.3.0 zip attached to the v0.11.0 release on GitHub, replaced on 2026-10-30 without a new version number (still 2026102904). An install made before then does not have it.
+
 - Restoring a backup whose embedded-file entry has no link id no longer raises a warning. The entry is skipped, as an entry with a bad content hash already was. Found by a security review (hardening).
 
 ## 0.3.0 (2026-10-29)

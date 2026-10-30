@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+The two changes below are already in the v0.11.0 zip on GitHub, replaced on 2026-10-30 without a new version number (still 2026102910). An install made before then does not have them.
+
 - Removed an unused import from the privacy provider.
 - A transcript may have at most 100,000 characters (`content::MAX_TRANSCRIPT_LENGTH`). The edit form refuses a longer one. Before, there was no limit. Found by a security review (hardening).
 

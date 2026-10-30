@@ -8,7 +8,10 @@ and the bundle zip attached.
 
 ## Unreleased
 
-Hardening found by a security review of both plugins (no release yet):
+Hardening found by a security review of both plugins. These changes are **already in the v0.11.0 plugin zips and bundle on GitHub**,
+which were replaced on 2026-10-30 with builds that include them. The version numbers did not change (`contenttype_mediabank`
+2026102910 and `local_mediabank` 2026102904), so an install made before that date does not have them and Moodle will not offer
+an upgrade. Download the zips again and install over the top to get them. The next release will carry them under a new number.
 
 - `contenttype_mediabank`: a transcript may have at most 100,000 characters. The edit form refuses a longer one.
 - `local_mediabank`: restoring a backup whose embedded-file entry has no link id skips the entry quietly.

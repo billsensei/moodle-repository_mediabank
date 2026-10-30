@@ -6,7 +6,7 @@
 Writes, into DIR (default: ./dist):
   contenttype_mediabank_<version>.zip   installable with Site administration > Plugins > Install plugins
   local_mediabank_<version>.zip         installable the same way (install the content type first)
-  mediabank-<release>-bundle.zip        both zips and the guides, for sending to a client; NOT installable itself
+  mediabank-<release>-bundle.zip        both zips, the guides and a READ-ME-FIRST.txt, for sending to a client; NOT installable itself
 
 Each plugin zip has one top folder called "mediabank", which is what Moodle's installer expects. The zips are
 reproducible: file order and timestamps come from the files and the last commit, not from the time of the build.
@@ -69,11 +69,33 @@ def build_plugin(plugin: str, out: Path, timestamp: tuple) -> Path:
     return target
 
 
+READ_ME_FIRST = """DO NOT UPLOAD THIS BUNDLE TO MOODLE.
+
+This file came from {bundle}. That zip is a package, not a plugin,
+so Moodle cannot install it and will ask you to "choose a plugin type".
+
+What to do:
+
+  1. Unzip the bundle on your computer (you have probably done this already).
+  2. In Moodle, go to Site administration > Plugins > Install plugins.
+  3. Upload {first} first.
+  4. Then upload {second}.
+     Upload each zip as it is. Do not unzip them.
+
+Leave "Plugin type" alone. Moodle detects it by itself for these two files.
+
+The guides are in this folder. Start with INSTALL.md, or Install-Walk-Thru.pdf if
+you would like pictures. If something goes wrong, see TROUBLESHOOTING.md.
+"""
+
+
 def build_bundle(zips: list, out: Path, timestamp: tuple) -> Path:
     _, release = read_version('contenttype_mediabank')
     target = out / f'mediabank-{release}-bundle.zip'
     root = f'mediabank-{release}-bundle/'
     with zipfile.ZipFile(target, 'w') as zf:
+        note = READ_ME_FIRST.format(bundle=target.name, first=zips[0].name, second=zips[1].name)
+        add(zf, root + 'READ-ME-FIRST.txt', note.encode(), timestamp, 0o100644)
         for z in zips:
             add(zf, root + z.name, z.read_bytes(), timestamp, 0o100644)
         for guide in GUIDES:

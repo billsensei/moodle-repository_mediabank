@@ -64,6 +64,7 @@ Full steps, including installing by hand, are in [docs/INSTALL.md](docs/INSTALL.
 - [Roadmap](docs/ROADMAP.md): where it stands and what might come next
 - [Contributors](docs/CONTRIBUTORS.md): who has helped, and how to be listed
 - [Code of conduct](docs/CODE-OF-CONDUCT.md): the short version, with how to report a problem
+- [Maintainers](docs/MAINTAINERS.md): who looks after it, the standing rules, and the release routine
 
 ## Tested
 

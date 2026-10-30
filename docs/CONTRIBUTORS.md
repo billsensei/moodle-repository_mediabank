@@ -4,7 +4,7 @@ Thank you to everyone who has helped build the Media bank.
 
 ## Maintainer
 
-- **Bill White** ([SenseiMoodle](https://github.com/billsensei)): owner and maintainer. Set the direction, chose the policies (for example that SVG is off by default, and that erasing a person keeps courses' files as copies), and approves every release.
+- **Bill White** ([SenseiMoodle](https://github.com/billsensei)): owner and maintainer. Set the direction, chose the policies (for example that SVG is off by default, and that erasing a person keeps courses' files as copies), and approves every release. See [MAINTAINERS.md](MAINTAINERS.md).
 
 ## Built with
 

@@ -1,7 +1,7 @@
 # Changelog
 
-## Unreleased
-The two changes below are already in the v0.11.0 zip on GitHub, replaced on 2026-10-30 without a new version number (still 2026102910). An install made before then does not have them.
+## 0.11.1 (2026-10-30)
+Hardening only. The same code was put in the v0.11.0 zip on GitHub on 2026-10-30 without a new version number (it was still 2026102910), so an install made before then does not have it and Moodle did not offer an upgrade. This release carries it under a new number (2026103000): install it over any v0.11.0 and Moodle upgrades.
 
 - Removed an unused import from the privacy provider.
 - A transcript may have at most 100,000 characters (`content::MAX_TRANSCRIPT_LENGTH`). The edit form refuses a longer one. Before, there was no limit. Found by a security review (hardening).

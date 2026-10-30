@@ -68,6 +68,7 @@ Short notes on what matters to someone upgrading. The full lists are in [CHANGEL
 
 | From | To | What you notice | What to do |
 |---|---|---|---|
+| 0.11.0 | 0.11.1 | Nothing you see. Hardening: a transcript may have at most 100,000 characters, and restoring a backup with a damaged embedded-file entry skips it quietly. The v0.11.0 download on GitHub was replaced with this code on 2026-10-30 without a new number, so install 0.11.1 over any v0.11.0 to be sure you have it. | Install the new zips, content type first. Nothing else. |
 | any | 0.11.0 | New setting **Allow SVG images**, **off by default**. SVG uploads are refused unless it is on. | Nothing, unless you want SVG. See "SVG files" in the Administrator guide before switching it on. |
 | before 0.10.0 | 0.10.0 or later | New setting **Prepare MP4 videos for streaming**, on by default. New and replaced MP4s are queued for a background task. The MP4 as uploaded is kept as an earlier version. | Make sure cron runs. Queue older videos with `optimize_videos.php` if you want. To keep the old behaviour, switch the setting off. |
 | before 0.9.2 | 0.9.2 or later | An item's file is served only to people who may see the item. Before, any logged-in user who knew the address could fetch any item, unlisted ones included. Language strings are in alphabetical order. | Nothing. This is a fix. |

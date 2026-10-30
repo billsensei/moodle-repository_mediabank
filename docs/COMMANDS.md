@@ -8,11 +8,11 @@ current ones. For the procedures in the order you would use them, read [DEVELOPM
 Paths are this machine's: Moodle trees in `/home/bill/test2/{moodle,moodle51,moodle52,moodle53}` (5.0 has no `public/` folder),
 MariaDB on `127.0.0.1:3307`, and `export LOCPATH=~/.local/locale` in a fresh shell before any PHPUnit or Behat run.
 
-## Current numbers (contenttype 0.11.0, local 0.3.0)
+## Current numbers (contenttype 0.11.1, local 0.3.1)
 
 | Check | Result |
 |---|---|
-| `contenttype_mediabank_testsuite` | 118 tests, 507 assertions, on Moodle 5.0, 5.1, 5.2 and 5.3 |
+| `contenttype_mediabank_testsuite` | 119 tests, 509 assertions, on Moodle 5.0, 5.1, 5.2 and 5.3 |
 | `local_mediabank/tests/backup_restore_test.php` | 7 tests, 27 assertions |
 | Behat `@contenttype_mediabank` | 7 scenarios, 151 steps (about 6 minutes) |
 | Core privacy and event checks | pass on 5.0 to 5.3 |
@@ -304,7 +304,7 @@ Pieces: `classes/svg_validator.php` (DOM allow-list), `upload_rules::is_svg_allo
 
     export LOCPATH=~/.local/locale; cd /home/bill/test2/moodle53
     vendor/bin/phpunit --testsuite contenttype_mediabank_testsuite
-Expected: `OK, but there were issues!` with `Tests: 118, Assertions: 507` on 5.0 to 5.3 (the issues are the doc-comment deprecations noted above).
+Expected: `OK, but there were issues!` with `Tests: 119, Assertions: 509` on 5.0 to 5.3 (the issues are the doc-comment deprecations noted above).
 Test traps met:
 - The test database keeps the stored default of `allowsvg` from the install. Tests set or unset the config explicitly and call `upload_rules::purge_caches()`.
 - Every test that touches the database resets it (about 10 s each). `svg_validator_test` extends `basic_testcase` and loops over its samples inside one test; avoid data providers for the same reason.

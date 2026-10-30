@@ -8,15 +8,29 @@ and the bundle zip attached.
 
 ## Unreleased
 
-Hardening found by a security review of both plugins. These changes are **already in the v0.11.0 plugin zips and bundle on GitHub**,
-which were replaced on 2026-10-30 with builds that include them. The version numbers did not change (`contenttype_mediabank`
-2026102910 and `local_mediabank` 2026102904), so an install made before that date does not have them and Moodle will not offer
-an upgrade. Download the zips again and install over the top to get them. The next release will carry them under a new number.
+Nothing yet.
+
+## [0.11.1] - 2026-10-30
+
+`contenttype_mediabank` 0.11.1 (2026103000), `local_mediabank` 0.3.1 (2026103000).
+
+Hardening found by a security review of both plugins. No new feature, no new setting, and nothing for an administrator to decide.
 
 - `contenttype_mediabank`: a transcript may have at most 100,000 characters. The edit form refuses a longer one.
 - `local_mediabank`: restoring a backup whose embedded-file entry has no link id skips the entry quietly.
 - Administrator guide: web service results hold text typed by teachers, so a program that shows them must escape them; and a
   backup with linked files holds the item's current file, even if the owner has since made the item unlisted.
+- Privacy provider: an unused import was removed, and the Administrator guide now says that an item belongs to the person who created it, as in Moodle's own Content bank.
+
+**A note on v0.11.0.** The same code was put in the v0.11.0 plugin zips and bundle on GitHub on 2026-10-30, without a new version
+number (`contenttype_mediabank` 2026102910 and `local_mediabank` 2026102904). An install made before that date does not have it,
+and Moodle did not offer an upgrade. 0.11.1 carries it under a new number, so Moodle offers the upgrade. Install it over any
+v0.11.0 download.
+
+Documentation and repository only, no change to the plugins: a Getting started guide, a Governance page, Maintainers, Releasing,
+Changelog policy, Style guide, Translating, Funding, Acknowledgements, Code of conduct (short version) and Plugin directory
+pages; a "Which file do I download?" section in the Install guide; and a `READ-ME-FIRST.txt` in the bundle, which says the bundle
+itself is not installable.
 
 ## [0.11.0] - 2026-10-29
 
@@ -83,6 +97,7 @@ Repository and documentation only, no change to the plugins:
 - Both plugins are Beta. Language strings are in alphabetical order and the privacy test is in `tests/privacy/`, as Moodle's
   current coding standard requires (found by the first GitHub Actions run).
 
+[0.11.1]: https://github.com/billsensei/moodle-repository_mediabank/releases/tag/v0.11.1
 [0.11.0]: https://github.com/billsensei/moodle-repository_mediabank/releases/tag/v0.11.0
 [0.10.0]: https://github.com/billsensei/moodle-repository_mediabank/releases/tag/v0.10.0
 [0.9.2]: https://github.com/billsensei/moodle-repository_mediabank/releases/tag/v0.9.2

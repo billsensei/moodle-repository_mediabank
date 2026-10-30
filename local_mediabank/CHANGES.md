@@ -1,7 +1,7 @@
 # Changelog
 
-## Unreleased
-The change below is already in the 0.3.0 zip attached to the v0.11.0 release on GitHub, replaced on 2026-10-30 without a new version number (still 2026102904). An install made before then does not have it.
+## 0.3.1 (2026-10-30)
+Hardening only. The same code was put in the 0.3.0 zip attached to the v0.11.0 release on 2026-10-30 without a new version number (it was still 2026102904), so an install made before then does not have it and Moodle did not offer an upgrade. This release carries it under a new number (2026103000): install it over any 0.3.0 and Moodle upgrades.
 
 - Restoring a backup whose embedded-file entry has no link id no longer raises a warning. The entry is skipped, as an entry with a bad content hash already was. Found by a security review (hardening).
 

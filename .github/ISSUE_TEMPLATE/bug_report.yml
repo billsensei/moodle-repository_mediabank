@@ -21,7 +21,7 @@ body:
     id: plugin-versions
     attributes:
       label: Plugin versions
-      description: Site administration, Plugins, Plugins overview. For example "contenttype 0.10.0, local 0.3.0".
+      description: Site administration, Plugins, Plugins overview. For example "contenttype 0.11.1, local 0.3.1".
     validations:
       required: true
   - type: input

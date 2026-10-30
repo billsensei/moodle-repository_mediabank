@@ -4,7 +4,7 @@ Where the project stands and where it could go. **This is a list of ideas, not p
 
 ## Where it stands
 
-Both plugins are **Beta** (released for testing): `contenttype_mediabank` 0.11.0 and `local_mediabank` 0.3.0, for Moodle 5.0 to 5.3. The features work and are well tested, but the plugins have not had long use on real sites. What has and has not been tested is listed in the Administrator guide, section 12.
+Both plugins are **Beta** (released for testing): `contenttype_mediabank` 0.11.1 and `local_mediabank` 0.3.1, for Moodle 5.0 to 5.3. The features work and are well tested, but the plugins have not had long use on real sites. What has and has not been tested is listed in the Administrator guide, section 12.
 
 ## 1. Towards a stable release
 

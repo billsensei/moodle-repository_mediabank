@@ -16,8 +16,8 @@ Status: **Beta**. Released for testing, so try it on a copy of your site first. 
 
 | Plugin | Folder | Version | Needs |
 |---|---|---|---|
-| Media bank content type (`contenttype_mediabank`) | `contenttype_mediabank/` | 0.11.0 | Moodle 5.0 to 5.3 |
-| Media bank tools (`local_mediabank`) | `local_mediabank/` | 0.3.0 | the content type |
+| Media bank content type (`contenttype_mediabank`) | `contenttype_mediabank/` | 0.11.1 | Moodle 5.0 to 5.3 |
+| Media bank tools (`local_mediabank`) | `local_mediabank/` | 0.3.1 | the content type |
 
 **This is one repository with two separate plugins.** Moodle installs each one from its own zip, so do not use GitHub's **Code → Download ZIP**. Download the two plugin zips from the [releases page](https://github.com/billsensei/moodle-repository_mediabank/releases) instead (see "Install" below).
 

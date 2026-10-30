@@ -5,7 +5,7 @@ Thank you for helping with the Media bank. This project is two Moodle plugins in
 - `contenttype_mediabank/`: the content type (the main plugin)
 - `local_mediabank/`: backup and restore of links, and command-line tools. It needs the content type.
 
-Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md). If you write or edit a guide, see the [Style guide](docs/STYLE-GUIDE.md).
 
 Both are **Beta**, for Moodle 5.0 to 5.3. By contributing you agree that your work is released under the
 [GNU GPL v3 or later](LICENSE), the same as the rest of the project.

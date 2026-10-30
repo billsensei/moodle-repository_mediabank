@@ -61,7 +61,7 @@ A change is ready to merge when:
 
 ## Making a release
 
-The steps are in "Releasing" in the [Development guide](DEVELOPMENT.md). In short:
+The full checklist is in [RELEASING.md](RELEASING.md); the commands behind it are in "Releasing" in the [Development guide](DEVELOPMENT.md). In short:
 
 1. Update the version, the release name and the changelogs on a branch.
 2. Run the checks on Moodle 5.0, 5.1, 5.2 and 5.3, then build the zips with `scripts/build_release.py` and validate each one with `scripts/validate_plugin_zip.php`.
